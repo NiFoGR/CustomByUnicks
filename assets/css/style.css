@@ -28,7 +28,7 @@
 }
 
 *,*::before,*::after{box-sizing:border-box}
-html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;background:#0a0a0b}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
@@ -44,6 +44,9 @@ img{max-width:100%;display:block;height:auto}
 figure,blockquote{margin:0}
 a{color:inherit;text-decoration:none}
 button{font:inherit;color:inherit;cursor:pointer}
+:where(a,button,input,select,textarea,[tabindex]):focus-visible{
+  outline:2px solid var(--gold-lt);outline-offset:3px;border-radius:2px;
+}
 ::selection{background:var(--gold);color:var(--ink)}
 
 /* ---------- Type ---------- */

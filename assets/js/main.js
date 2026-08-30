@@ -40,12 +40,13 @@ var CONTACT_EMAIL = '';
     var current = scrollY;
     var wheeling = false;
     var settleTimer = null;
-    var maxScroll = function () {
+    function maxScroll() {
       return Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-    };
+    }
 
     window.addEventListener('wheel', function (e) {
       if (e.ctrlKey) return;                       // let pinch-zoom through
+      if (maxScroll() <= 0) return;                // nothing to scroll: never trap the wheel
       if (e.target.closest && e.target.closest('.drawer.is-open')) return;
       e.preventDefault();
       var d = e.deltaY;
@@ -246,7 +247,9 @@ var CONTACT_EMAIL = '';
     document.body.dataset.heroIn = '1';
   };
   if (intro) {
-    if (REDUCED || sessionStorage.getItem('unicks_seen')) {
+    var seen = false;
+    try { seen = !!sessionStorage.getItem('unicks_seen'); } catch (err) {}
+    if (REDUCED || seen) {
       intro.remove();
       startHero();
     } else {
