@@ -41,6 +41,16 @@
 </head>
 <body>
 
+<div class="intro" id="intro" aria-hidden="true">
+  <img class="intro__mark" src="assets/img/logo-avatar.jpg" alt="">
+  <span class="intro__bar"></span>
+</div>
+<div class="prog" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+<div class="vig" aria-hidden="true"></div>
+<div class="cur" aria-hidden="true"></div>
+<div class="cur-r" aria-hidden="true"></div>
+
 <!-- ============ HEADER ============ -->
 <header class="hdr" id="hdr">
   <div class="wrap hdr__in">
@@ -60,7 +70,7 @@
       <a href="#faq">FAQ</a>
     </nav>
 
-    <a href="#consultation" class="btn btn--sm hdr__cta">Book a consultation</a>
+    <a href="#consultation" class="btn btn--sm hdr__cta"><span class="btn__t">Book a consultation</span></a>
 
     <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false" aria-controls="drawer">
       <span></span><span></span><span></span>
@@ -74,7 +84,7 @@
   <a href="#process">Process</a>
   <a href="#about">About</a>
   <a href="#faq">FAQ</a>
-  <a href="#consultation" class="btn">Book a consultation</a>
+  <a href="#consultation" class="btn"><span class="btn__t">Book a consultation</span></a>
 </div>
 
 <main id="top">
@@ -85,15 +95,15 @@
     <img src="assets/img/project-onyx-wetroom.jpg" alt="Dark marble wet room with a stone bench, terrazzo floor and backlit niche, built by Unick's" fetchpriority="high">
   </div>
   <div class="wrap hero__in">
-    <p class="eyebrow">Premium bathrooms · United Kingdom</p>
-    <h1>Turning Dreams <em>Into Reality</em></h1>
-    <p class="hero__lede">
+    <p class="eyebrow rv">Premium bathrooms · United Kingdom</p>
+    <h1 data-split>Turning Dreams <em>Into Reality</em></h1>
+    <p class="hero__lede rv rv-d1">
       We design, supply and build premium bathrooms — start to finish, by one team.
       No handing you between trades, no half-finished weeks, no surprises on the invoice.
     </p>
-    <div class="hero__btns">
-      <a href="#consultation" class="btn">Book a free design consultation</a>
-      <a href="#work" class="btn btn--ghost">View our work</a>
+    <div class="hero__btns rv rv-d2">
+      <a href="#consultation" class="btn"><span class="btn__t">Book a free design consultation</span></a>
+      <a href="#work" class="btn btn--ghost"><span class="btn__t">View our work</span></a>
     </div>
   </div>
   <span class="hero__scroll" aria-hidden="true">Scroll</span>
@@ -130,12 +140,12 @@
 <!-- ============ ABOUT / INTRO ============ -->
 <section class="section" id="about">
   <div class="wrap split">
-    <div class="split__media rv">
+    <div class="split__media" data-rv="mask" data-para="0.7">
       <img src="assets/img/project-brass-suite.jpg" alt="Marble bathroom with freestanding bath, brushed brass towel radiator and lit display niches" loading="lazy">
     </div>
     <div class="rv rv-d1">
       <p class="eyebrow">Who we are</p>
-      <h2>A bathroom is built once.<br>We build it <span class="serif-i gold">properly</span>.</h2>
+      <h2 data-split>A bathroom is built once.<br>We build it <span class="serif-i gold">properly</span>.</h2>
       <p class="lede">
         Unick's is a UK bathroom specialist. We take a room back to brick and hand it
         back finished — first fix, tiling, brassware, lighting, glass and final seal.
@@ -161,7 +171,7 @@
   <div class="wrap">
     <div class="rv" style="max-width:720px;margin-bottom:clamp(2.6rem,5vw,4.2rem)">
       <p class="eyebrow">What we do</p>
-      <h2>Four stages, one contract</h2>
+      <h2 data-split>Four stages, one contract</h2>
       <p class="lede" style="margin-top:1.3rem">
         You deal with us for all of it. One quote, one schedule, one number to call.
       </p>
@@ -197,7 +207,7 @@
   <div class="wrap">
     <div class="rv" style="max-width:720px;margin-bottom:clamp(2.4rem,4.5vw,3.6rem)">
       <p class="eyebrow">Our signature</p>
-      <h2>Dark or light</h2>
+      <h2 data-split>Dark or light</h2>
       <p class="lede" style="margin-top:1.3rem">
         Two directions, one standard of build. Most clients know which one they are
         the moment they see them side by side.
@@ -205,14 +215,14 @@
     </div>
 
     <div class="dl">
-      <article class="dl__panel rv">
+      <article class="dl__panel" data-rv="mask">
         <img src="assets/img/project-onyx-wetroom.jpg" alt="Dark onyx-effect wet room with terrazzo floor and concealed lighting" loading="lazy">
         <div class="dl__body">
           <h3>Dark</h3>
           <p>Onyx and deep marble, terrazzo underfoot, matte black brassware and light hidden in the joints. A room that closes around you.</p>
         </div>
       </article>
-      <article class="dl__panel rv rv-d1">
+      <article class="dl__panel" data-rv="mask">
         <img src="assets/img/project-stone-ensuite.jpg" alt="Light stone en-suite with halo-lit mirror, floating vanity and warm concealed lighting" loading="lazy">
         <div class="dl__body">
           <h3>Light</h3>
@@ -228,7 +238,7 @@
   <div class="wrap">
     <div class="rv" style="max-width:720px;margin-bottom:clamp(2.2rem,4vw,3rem)">
       <p class="eyebrow">Selected work</p>
-      <h2>Built by us, <span class="serif-i gold">start to finish</span></h2>
+      <h2 data-split>Built by us, <span class="serif-i gold">start to finish</span></h2>
       <p class="lede" style="margin-top:1.3rem">
         Every room below was designed, supplied and installed by our own team.
       </p>
@@ -242,31 +252,31 @@
     </div>
 
     <div class="grid" id="grid">
-      <figure class="tile tile--lg rv" data-cat="dark">
+      <figure class="tile tile--lg" data-rv="mask" data-cat="dark">
         <img src="assets/img/project-onyx-wetroom.jpg" alt="Onyx-effect walk-in wet room with stone bench and terrazzo floor" loading="lazy">
         <figcaption class="tile__cap"><h3>The Onyx Wet Room</h3><span>Walk-in wet room &middot; Dark</span></figcaption>
       </figure>
-      <figure class="tile tile--lg rv rv-d1" data-cat="light">
+      <figure class="tile tile--lg" data-rv="mask" data-cat="light">
         <img src="assets/img/project-stone-ensuite.jpg" alt="Light stone en-suite with halo-lit mirror and floating oak vanity" loading="lazy">
         <figcaption class="tile__cap"><h3>Stone En-suite</h3><span>En-suite &middot; Light</span></figcaption>
       </figure>
-      <figure class="tile tile--lg rv" data-cat="light">
+      <figure class="tile tile--lg" data-rv="mask" data-cat="light">
         <img src="assets/img/project-brass-suite.jpg" alt="Marble bathroom with freestanding bath and brushed brass fittings" loading="lazy">
         <figcaption class="tile__cap"><h3>The Brass Suite</h3><span>Family bathroom &middot; Light</span></figcaption>
       </figure>
-      <figure class="tile tile--lg rv rv-d1" data-cat="detail">
+      <figure class="tile tile--lg" data-rv="mask" data-cat="detail">
         <img src="assets/img/detail-brassware.jpg" alt="Brushed brass basin tap and waste, close detail" loading="lazy">
         <figcaption class="tile__cap"><h3>Brushed Brass</h3><span>Brassware &middot; Detail</span></figcaption>
       </figure>
-      <figure class="tile tile--sm rv" data-cat="dark">
+      <figure class="tile tile--sm" data-rv="mask" data-cat="dark">
         <img src="assets/img/grid-hex-tile.jpg" alt="Dark hexagonal feature tiling with a stone-filled basket detail" loading="lazy">
         <figcaption class="tile__cap"><h3>Hex Feature Wall</h3><span>Tiling &middot; Dark</span></figcaption>
       </figure>
-      <figure class="tile tile--sm rv rv-d1" data-cat="dark">
+      <figure class="tile tile--sm" data-rv="mask" data-cat="dark">
         <img src="assets/img/grid-round-mirror.jpg" alt="Circular backlit mirror above a dark marble vanity" loading="lazy">
         <figcaption class="tile__cap"><h3>Halo Vanity</h3><span>Vanity &middot; Dark</span></figcaption>
       </figure>
-      <figure class="tile tile--sm rv rv-d2" data-cat="light">
+      <figure class="tile tile--sm" data-rv="mask" data-cat="light">
         <img src="assets/img/grid-walkin-shower.jpg" alt="Walk-in shower with stone bench and recessed lighting" loading="lazy">
         <figcaption class="tile__cap"><h3>Bench Shower</h3><span>Walk-in shower &middot; Light</span></figcaption>
       </figure>
@@ -286,7 +296,7 @@
   <div class="wrap">
     <div class="rv" style="max-width:720px;margin-bottom:clamp(2.6rem,5vw,4rem)">
       <p class="eyebrow">How it works</p>
-      <h2>From first call to final seal</h2>
+      <h2 data-split>From first call to final seal</h2>
       <p class="lede" style="margin-top:1.3rem">
         A typical bathroom runs <span class="ph">[2–4 weeks]</span> on site. Here is exactly how it goes.
       </p>
@@ -324,7 +334,7 @@
 
 <!-- ============ QUOTE BAND ============ -->
 <section class="band">
-  <div class="band__bg"><img src="assets/img/detail-brassware.jpg" alt="" loading="lazy"></div>
+  <div class="band__bg"><img src="assets/img/detail-brassware.jpg" alt="" loading="lazy" data-para="1.0"></div>
   <div class="wrap band__in rv">
     <blockquote>&ldquo;Anyone can fit a bathroom. Getting the light, the lines and the stone to agree with each other — that is the job.&rdquo;</blockquote>
     <cite>Unick's · #CustomBuilt</cite>
@@ -336,7 +346,7 @@
   <div class="wrap">
     <div class="rv" style="max-width:720px;margin-bottom:clamp(2.4rem,4.5vw,3.4rem)">
       <p class="eyebrow">Client feedback</p>
-      <h2>What our clients say</h2>
+      <h2 data-split>What our clients say</h2>
     </div>
     <div class="quotes">
       <blockquote class="quote rv">
@@ -363,7 +373,7 @@
   <div class="wrap">
     <div class="rv" style="text-align:center;margin-bottom:clamp(2.4rem,4.5vw,3.4rem)">
       <p class="eyebrow is-center">Common questions</p>
-      <h2>Good to know</h2>
+      <h2 data-split>Good to know</h2>
     </div>
 
     <div class="faq">
@@ -404,7 +414,7 @@
   <div class="wrap contact">
     <aside class="contact__aside rv">
       <p class="eyebrow">Start here</p>
-      <h2>Book a free design consultation</h2>
+      <h2 data-split>Book a free design consultation</h2>
       <p class="lede" style="margin-top:1.3rem">
         Tell us about the room. We will come back within <span class="ph">[24 hours]</span> with next
         steps and a realistic idea of cost — no pressure, no obligation.
@@ -510,7 +520,7 @@
           <label for="consent">I'm happy for Unick's to contact me about this enquiry.</label>
         </div>
 
-        <button type="submit" class="btn btn--block" id="submitBtn">Request my consultation</button>
+        <button type="submit" class="btn btn--block" id="submitBtn"><span class="btn__t">Request my consultation</span></button>
         <p class="form__note">Free and no obligation. We reply to every enquiry.</p>
       </form>
     </div>

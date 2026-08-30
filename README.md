@@ -119,10 +119,43 @@ assets/img/             # photography
 Sections in order: hero → trust strip → about → services → dark/light →
 portfolio → process → quote band → testimonials → FAQ → consultation form → footer.
 
+## Motion
+
+The feel of the site is deliberate, and lives in `assets/js/main.js` (sections 1–7)
+plus the `MOTION LAYER` block at the end of `style.css`.
+
+- **Damped scrolling.** Wheel input is captured and eased toward a target
+  (`window.scrollTo` each frame), so scrolling has weight instead of stepping.
+  Native scrollbar, keyboard, anchors and IntersectionObserver all still work
+  because real scroll position still moves. Desktop pointers only — touch already
+  has its own momentum.
+- **Parallax.** The hero image drifts at 0.2× scroll with a slow entrance scale;
+  the about image and quote band drift against their sections. Both have extra
+  image height so the drift never exposes an edge — if you change a parallax
+  amount, check the matching `height`/`top` in CSS.
+- **Curtain reveals.** `data-rv="mask"` wipes a curtain off the image while the
+  image settles back from a 1.18 over-scale. This deliberately does *not* use
+  `clip-path` on the observed element: Chromium factors an element's own
+  `clip-path` into its IntersectionObserver rect, so a fully clipped box reports
+  zero intersection and never reveals.
+- **Word-rise headings.** `data-split` wraps each word in a clipping span so it
+  rises from behind its own baseline, staggered left to right. Nested markup
+  (`<em>`, `<span>`) is preserved.
+- **Stagger.** Siblings in a group get an increasing `--i`, which feeds
+  `transition-delay`, so rows cascade rather than landing together.
+- **Surface.** A fine animated grain and a vignette sit over everything at very
+  low opacity; they are what stop a flat dark page reading as flat.
+- **Intro.** Brand mark and a loading bar, once per session (`sessionStorage`),
+  handing off to the hero choreography.
+
+Tuning: easing tokens (`--e-expo`, `--e-quart`) and durations (`--d-slow`,
+`--d-mid`) are at the top of the motion layer. Slower and further = heavier.
+
 ## Notes
 
 - Responsive down to 320px; breakpoints at 1080 / 900 / 620px.
-- Respects `prefers-reduced-motion`.
+- Respects `prefers-reduced-motion` — the entire motion layer disables itself:
+  no intro, no grain, no cursor, no damped scroll, everything visible immediately.
 - Fonts load from Google Fonts, with a system serif/sans fallback stack.
 - Includes `HomeAndConstructionBusiness` structured data for search results —
   worth extending with the real address and phone once known, since local search
