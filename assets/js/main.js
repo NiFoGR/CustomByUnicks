@@ -1,12 +1,12 @@
 /* ==========================================================================
-   UNICK'S — site behaviour + motion engine
+   UNICK'S site behaviour + motion engine
    --------------------------------------------------------------------------
    SETUP: fill these two in to make the enquiry form live.
 
-   FORM_ENDPOINT — a form-handling URL (Formspree, Basin, Netlify Forms,
+   FORM_ENDPOINT: a form-handling URL (Formspree, Basin, Netlify Forms,
                    Getform…). Enquiries are POSTed here. Leave empty to fall
                    back to opening the visitor's email client instead.
-   CONTACT_EMAIL — the inbox enquiries should reach. Used for the mailto
+   CONTACT_EMAIL: the inbox enquiries should reach. Used for the mailto
                    fallback when no endpoint is set.
    ========================================================================== */
 var FORM_ENDPOINT = '';
@@ -28,7 +28,7 @@ var CONTACT_EMAIL = '';
      Wheel input is captured and eased toward a target, then written back
      with window.scrollTo. Native scrollbar, keyboard, anchors and
      IntersectionObserver all keep working because real scroll still moves.
-     Desktop pointers only — touch already has momentum of its own.
+     Desktop pointers only; touch already has momentum of its own.
      ====================================================================== */
   var scrollY = window.scrollY || 0;
   var LERP_ON = FINE && !REDUCED;
@@ -58,7 +58,7 @@ var CONTACT_EMAIL = '';
     }, { passive: false });
 
     // Anything that moves the page without the wheel (scrollbar drag, keys,
-    // find-in-page) must not fight the loop — adopt its position instead.
+    // find-in-page) must not fight the loop, so adopt its position instead.
     window.addEventListener('scroll', function () {
       if (!wheeling && Math.abs(window.scrollY - current) > 2) {
         current = target = window.scrollY;
@@ -135,7 +135,7 @@ var CONTACT_EMAIL = '';
   if (!REDUCED) $$('[data-split]').forEach(splitWords);
 
   /* ======================================================================
-     3. REVEALS — staggered per group, not all at once
+     3. REVEALS: staggered per group, not all at once
      ====================================================================== */
   var revealables = $$('.rv, [data-rv], [data-split], .step').filter(function (el) {
     return !el.closest('.hero');      // the intro sequence drives these
@@ -163,7 +163,7 @@ var CONTACT_EMAIL = '';
   }
 
   /* ======================================================================
-     4. PARALLAX — layered depth, read once per frame
+     4. PARALLAX: layered depth, read once per frame
      ====================================================================== */
   var paraEls = $$('[data-para]');
   var heroImg = $('.hero__bg img');
@@ -207,7 +207,7 @@ var CONTACT_EMAIL = '';
   }
 
   /* ======================================================================
-     6. CUSTOM CURSOR — trailing ring, swells over interactive targets
+     6. CUSTOM CURSOR: trailing ring, swells over interactive targets
      ====================================================================== */
   var dot = $('.cur'), ring = $('.cur-r');
   if (dot && ring && FINE && !REDUCED) {
@@ -238,7 +238,7 @@ var CONTACT_EMAIL = '';
   }
 
   /* ======================================================================
-     7. INTRO SEQUENCE — once per session, then hand off to the hero
+     7. INTRO SEQUENCE: once per session, then hand off to the hero
      ====================================================================== */
   var intro = $('.intro');
   var startHero = function () {
@@ -264,7 +264,7 @@ var CONTACT_EMAIL = '';
   }
 
   /* ======================================================================
-     8. CHROME — year, header, drawer
+     8. CHROME: year, header, drawer
      ====================================================================== */
   var yr = $('#yr');
   if (yr) yr.textContent = new Date().getFullYear();
@@ -376,7 +376,7 @@ var CONTACT_EMAIL = '';
       'About the project:', d.message || '(none given)'
     ].join('\n');
     window.location.href = 'mailto:' + CONTACT_EMAIL +
-      '?subject=' + encodeURIComponent('Consultation request — ' + d.name) +
+      '?subject=' + encodeURIComponent('Consultation request from ' + d.name) +
       '&body=' + encodeURIComponent(lines);
   };
 
@@ -387,14 +387,14 @@ var CONTACT_EMAIL = '';
     var fd = new FormData(form), data = {};
     fd.forEach(function (v, k) { data[k] = v; });
 
-    if (data.company) { setMsg('Thank you — your request has been sent.', true); form.reset(); return; }
+    if (data.company) { setMsg('Thank you. Your request has been sent.', true); form.reset(); return; }
 
     if (!FORM_ENDPOINT) {
       if (CONTACT_EMAIL) {
         mailtoFallback(data);
         setMsg('Opening your email app to send this enquiry…', true);
       } else {
-        setMsg('This form is not connected yet — set FORM_ENDPOINT or CONTACT_EMAIL in assets/js/main.js.', false);
+        setMsg('This form is not connected yet. Set FORM_ENDPOINT or CONTACT_EMAIL in assets/js/main.js.', false);
       }
       return;
     }
@@ -408,7 +408,7 @@ var CONTACT_EMAIL = '';
       .then(function (r) {
         if (!r.ok) throw new Error('Bad response');
         form.reset();
-        setMsg('Thank you — your request has been sent. We will be in touch shortly.', true);
+        setMsg('Thank you. Your request has been sent. We will be in touch shortly.', true);
       })
       .catch(function () {
         setMsg('Something went wrong sending that. Please try again, or reach us on Instagram @custombyunicks.', false);

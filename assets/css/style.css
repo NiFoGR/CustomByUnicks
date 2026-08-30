@@ -1,5 +1,5 @@
 /* ==========================================================================
-   UNICK'S — Premium Bathroom Design & Installation
+   UNICK'S: Premium Bathroom Design & Installation
    Palette: near-black ground, brushed-gold accent, warm off-white text.
    ========================================================================== */
 
@@ -65,7 +65,7 @@ p:last-child{margin-bottom:0}
 .gold{color:var(--gold)}
 .serif-i{font-style:italic}
 
-/* Placeholder marker — anything the client still needs to confirm */
+/* Placeholder marker: anything the client still needs to confirm */
 .ph{
   color:var(--gold-lt);border-bottom:1px dashed rgba(200,163,90,.5);
   padding-bottom:1px;white-space:nowrap;
@@ -571,7 +571,7 @@ body.cursor-on.cur-hot .cur{opacity:0}
 /* legacy fixed delays still work, layered on top of --i */
 .rv-d1{--i:1}.rv-d2{--i:2}.rv-d3{--i:3}.rv-d4{--i:4}
 
-/* Mask reveal — a curtain wipes upward off the image while the image itself
+/* Mask reveal: a curtain wipes upward off the image while the image itself
    settles back from an over-scale.
    NOTE: this deliberately does NOT use clip-path on the observed element.
    Chromium factors an element's own clip-path into its IntersectionObserver
