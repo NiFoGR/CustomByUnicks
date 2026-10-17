@@ -1,13 +1,11 @@
 /* ==========================================================================
-   UNICK'S site behaviour + motion engine
+   UNICKS site behaviour
    --------------------------------------------------------------------------
-   SETUP: fill these two in to make the enquiry form live.
+   SETUP: fill in one of these to make the enquiry forms live.
 
-   FORM_ENDPOINT: a form-handling URL (Formspree, Basin, Netlify Forms,
-                   Getform…). Enquiries are POSTed here. Leave empty to fall
-                   back to opening the visitor's email client instead.
-   CONTACT_EMAIL: the inbox enquiries should reach. Used for the mailto
-                   fallback when no endpoint is set.
+   FORM_ENDPOINT  a form service URL (Formspree, Web3Forms, Basin…).
+                  Enquiries are POSTed there. Preferred.
+   CONTACT_EMAIL  fallback only: opens the visitor's own email app.
    ========================================================================== */
 var FORM_ENDPOINT = '';
 var CONTACT_EMAIL = '';
@@ -17,405 +15,315 @@ var CONTACT_EMAIL = '';
 
   var $  = function (s, c) { return (c || document).querySelector(s); };
   var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
-  var clamp = function (v, a, b) { return v < a ? a : v > b ? b : v; };
-  var lerp  = function (a, b, t) { return a + (b - a) * t; };
-
   var REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var FINE    = window.matchMedia('(pointer: fine)').matches;
+  var DATA = window.UNICKS_DATA;
+  var ARROW = '<svg viewBox="0 0 14 10" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M1 5h11M8.5 1.5L12 5 8.5 8.5"/></svg>';
+  var TICK = '<svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 6.5l2.5 2.5L10 3.5"/></svg>';
 
-  /* ======================================================================
-     1. DAMPED SCROLL
-     Wheel input is captured and eased toward a target, then written back
-     with window.scrollTo. Native scrollbar, keyboard, anchors and
-     IntersectionObserver all keep working because real scroll still moves.
-     Desktop pointers only; touch already has momentum of its own.
-     ====================================================================== */
-  var scrollY = window.scrollY || 0;
-  var LERP_ON = FINE && !REDUCED;
-
-  if (LERP_ON) {
-    document.documentElement.classList.add('has-lerp');
-
-    var target  = scrollY;
-    var current = scrollY;
-    var wheeling = false;
-    var settleTimer = null;
-    function maxScroll() {
-      return Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-    }
-
-    window.addEventListener('wheel', function (e) {
-      if (e.ctrlKey) return;                       // let pinch-zoom through
-      if (maxScroll() <= 0) return;                // nothing to scroll: never trap the wheel
-      if (e.target.closest && e.target.closest('.drawer.is-open')) return;
-      e.preventDefault();
-      var d = e.deltaY;
-      if (e.deltaMode === 1) d *= 16;              // lines -> px
-      else if (e.deltaMode === 2) d *= window.innerHeight;
-      target = clamp(target + d, 0, maxScroll());
-      wheeling = true;
-      clearTimeout(settleTimer);
-      settleTimer = setTimeout(function () { wheeling = false; }, 140);
-    }, { passive: false });
-
-    // Anything that moves the page without the wheel (scrollbar drag, keys,
-    // find-in-page) must not fight the loop, so adopt its position instead.
-    window.addEventListener('scroll', function () {
-      if (!wheeling && Math.abs(window.scrollY - current) > 2) {
-        current = target = window.scrollY;
-      }
-    }, { passive: true });
-
-    window.addEventListener('resize', function () {
-      target = clamp(target, 0, maxScroll());
-    });
-
-    // Eased anchor navigation
-    var glideTo = function (y) {
-      target = clamp(y, 0, maxScroll());
-      wheeling = true;
-      clearTimeout(settleTimer);
-      settleTimer = setTimeout(function () { wheeling = false; }, 900);
-    };
-    $$('a[href^="#"]').forEach(function (a) {
-      a.addEventListener('click', function (e) {
-        var id = a.getAttribute('href');
-        if (id === '#' || id.length < 2) return;
-        var el = document.getElementById(id.slice(1));
-        if (!el) return;
-        e.preventDefault();
-        glideTo(el.getBoundingClientRect().top + window.scrollY);
-      });
-    });
-
-    (function tick() {
-      current = lerp(current, target, 0.098);
-      if (Math.abs(target - current) < 0.08) current = target;
-      if (Math.abs(window.scrollY - current) > 0.05) window.scrollTo(0, current);
-      scrollY = current;
-      requestAnimationFrame(tick);
-    })();
-  } else {
-    window.addEventListener('scroll', function () { scrollY = window.scrollY; }, { passive: true });
-  }
-
-  /* ======================================================================
-     2. SPLIT HEADINGS INTO WORDS
-     Each word gets a clipping wrapper so it can rise out from behind its
-     own baseline. Nested markup (<em>, <span>) is preserved.
-     ====================================================================== */
-  var splitWords = function (root) {
-    var idx = 0;
-    var walk = function (node) {
-      Array.prototype.slice.call(node.childNodes).forEach(function (n) {
-        if (n.nodeType === 3) {
-          var text = n.nodeValue;
-          if (!text.trim()) return;
-          var frag = document.createDocumentFragment();
-          text.split(/(\s+)/).forEach(function (part) {
-            if (!part) return;
-            if (!part.trim()) { frag.appendChild(document.createTextNode(part)); return; }
-            var outer = document.createElement('span');
-            outer.className = 'w';
-            var inner = document.createElement('span');
-            inner.className = 'w__i';
-            inner.textContent = part;
-            inner.style.setProperty('--wi', idx++);
-            outer.appendChild(inner);
-            frag.appendChild(outer);
-          });
-          node.replaceChild(frag, n);
-        } else if (n.nodeType === 1 && !n.classList.contains('w')) {
-          walk(n);
-        }
-      });
-    };
-    walk(root);
+  var money = function (n) { return DATA.currency + n.toLocaleString('en-GB'); };
+  var esc = function (s) {
+    return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; });
   };
 
-  if (!REDUCED) $$('[data-split]').forEach(splitWords);
+  $$('[data-year]').forEach(function (el) { el.textContent = new Date().getFullYear(); });
 
-  /* ======================================================================
-     3. REVEALS: staggered per group, not all at once
-     ====================================================================== */
-  var revealables = $$('.rv, [data-rv], [data-split], .step').filter(function (el) {
-    return !el.closest('.hero');      // the intro sequence drives these
-  });
-
-  // give siblings inside a group an increasing --i so they cascade
-  $$('.trust__grid, .svc, .steps, .grid, .quotes, .dl, .faq, .contact__list').forEach(function (group) {
-    var i = 0;
-    Array.prototype.slice.call(group.children).forEach(function (child) {
-      if (child.matches('.rv, [data-rv], .step, li')) child.style.setProperty('--i', i++);
-    });
-  });
-
-  if (REDUCED || !('IntersectionObserver' in window)) {
-    revealables.forEach(function (el) { el.classList.add('is-in'); });
-  } else {
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) {
-        if (!en.isIntersecting) return;
-        en.target.classList.add('is-in');
-        io.unobserve(en.target);
-      });
-    }, { threshold: 0.1, rootMargin: '0px 0px -10% 0px' });
-    revealables.forEach(function (el) { io.observe(el); });
-  }
-
-  /* ======================================================================
-     4. PARALLAX: layered depth, read once per frame
-     ====================================================================== */
-  var paraEls = $$('[data-para]');
-  var heroImg = $('.hero__bg img');
-
-  if (!REDUCED && (paraEls.length || heroImg)) {
-    var vh = window.innerHeight;
-    window.addEventListener('resize', function () { vh = window.innerHeight; });
-
-    var enterFrom = null;                       // hero entrance easing
-    var easeOut = function (t) { return 1 - Math.pow(1 - t, 3); };
-
-    (function paraTick(now) {
-      if (heroImg && scrollY < vh * 1.4) {
-        if (enterFrom === null && document.body.dataset.heroIn) enterFrom = now || 0;
-        var e = enterFrom === null ? 0 : easeOut(clamp(((now || 0) - enterFrom) / 2000, 0, 1));
-        var scale = (1.12 - 0.12 * e) + Math.min(scrollY / vh, 1) * 0.06;
-        heroImg.style.transform =
-          'translate3d(0,' + (scrollY * 0.2).toFixed(2) + 'px,0) scale(' + scale.toFixed(4) + ')';
-      }
-      paraEls.forEach(function (el) {
-        var r = el.getBoundingClientRect();
-        if (r.bottom < -200 || r.top > vh + 200) return;
-        var speed = parseFloat(el.dataset.para) || 0.1;
-        var delta = ((r.top + r.height / 2) - vh / 2) / vh;   // -1 … 1
-        el.style.transform = 'translate3d(0,' + (delta * speed * 100).toFixed(2) + 'px,0)';
-      });
-      requestAnimationFrame(paraTick);
-    })(0);
-  }
-
-  /* ======================================================================
-     5. SCROLL PROGRESS
-     ====================================================================== */
-  var prog = $('.prog');
-  if (prog && !REDUCED) {
-    (function progTick() {
-      var max = document.documentElement.scrollHeight - window.innerHeight;
-      prog.style.transform = 'scaleX(' + (max > 0 ? clamp(scrollY / max, 0, 1) : 0).toFixed(4) + ')';
-      requestAnimationFrame(progTick);
-    })();
-  }
-
-  /* ======================================================================
-     6. CUSTOM CURSOR: trailing ring, swells over interactive targets
-     ====================================================================== */
-  var dot = $('.cur'), ring = $('.cur-r');
-  if (dot && ring && FINE && !REDUCED) {
-    var mx = window.innerWidth / 2, my = window.innerHeight / 2;
-    var rx = mx, ry = my, seen = false;
-
-    window.addEventListener('mousemove', function (e) {
-      mx = e.clientX; my = e.clientY;
-      if (!seen) { seen = true; rx = mx; ry = my; document.body.classList.add('cursor-on'); }
-    });
-    document.addEventListener('mouseleave', function () { document.body.classList.remove('cursor-on'); });
-    document.addEventListener('mouseenter', function () { if (seen) document.body.classList.add('cursor-on'); });
-
-    var hot = 'a, button, input, select, textarea, label, .tile, .dl__panel';
-    document.addEventListener('mouseover', function (e) {
-      if (e.target.closest(hot)) document.body.classList.add('cur-hot');
-    });
-    document.addEventListener('mouseout', function (e) {
-      if (e.target.closest(hot)) document.body.classList.remove('cur-hot');
-    });
-
-    (function curTick() {
-      rx = lerp(rx, mx, 0.16); ry = lerp(ry, my, 0.16);
-      dot.style.transform  = 'translate3d(' + mx + 'px,' + my + 'px,0)';
-      ring.style.transform = 'translate3d(' + rx.toFixed(2) + 'px,' + ry.toFixed(2) + 'px,0)';
-      requestAnimationFrame(curTick);
-    })();
-  }
-
-  /* ======================================================================
-     7. INTRO SEQUENCE: once per session, then hand off to the hero
-     ====================================================================== */
-  var intro = $('.intro');
-  var startHero = function () {
-    $$('.hero .rv, .hero [data-split]').forEach(function (el) { el.classList.add('is-in'); });
-    document.body.dataset.heroIn = '1';
-  };
-  if (intro) {
-    var seen = false;
-    try { seen = !!sessionStorage.getItem('unicks_seen'); } catch (err) {}
-    if (REDUCED || seen) {
-      intro.remove();
-      startHero();
-    } else {
-      document.body.style.overflow = 'hidden';
-      window.setTimeout(function () {
-        intro.classList.add('is-done');
-        document.body.style.overflow = '';
-        try { sessionStorage.setItem('unicks_seen', '1'); } catch (err) {}
-        startHero();
-        window.setTimeout(function () { intro.remove(); }, 1000);
-      }, 1500);
-    }
-  } else {
-    startHero();
-  }
-
-  /* ======================================================================
-     8. CHROME: year, header, drawer
-     ====================================================================== */
-  var yr = $('#yr');
-  if (yr) yr.textContent = new Date().getFullYear();
-
-  var hdr = $('#hdr');
-  var onScroll = function () { if (hdr) hdr.classList.toggle('is-stuck', window.scrollY > 40); };
-  onScroll();
-  window.addEventListener('scroll', onScroll, { passive: true });
-
-  var burger = $('#burger'), drawer = $('#drawer');
-  var closeDrawer = function () {
-    if (!drawer) return;
-    drawer.classList.remove('is-open');
-    burger.setAttribute('aria-expanded', 'false');
-    burger.setAttribute('aria-label', 'Open menu');
-    document.body.style.overflow = '';
-  };
+  /* ---------- Mobile menu ---------- */
+  var burger = $('.burger'), drawer = $('#drawer');
   if (burger && drawer) {
-    burger.addEventListener('click', function () {
-      var open = drawer.classList.toggle('is-open');
-      burger.setAttribute('aria-expanded', String(open));
-      burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    var setMenu = function (open) {
+      burger.setAttribute('aria-expanded', open);
+      drawer.classList.toggle('is-open', open);
       document.body.style.overflow = open ? 'hidden' : '';
-    });
-    $$('a', drawer).forEach(function (a) { a.addEventListener('click', closeDrawer); });
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeDrawer(); });
+    };
+    burger.addEventListener('click', function () { setMenu(burger.getAttribute('aria-expanded') !== 'true'); });
+    $$('a', drawer).forEach(function (a) { a.addEventListener('click', function () { setMenu(false); }); });
   }
 
-  /* ---------- Portfolio filter ---------- */
-  var filters = $$('.filter'), tiles = $$('#grid .tile');
-  filters.forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      var cat = btn.dataset.filter;
-      filters.forEach(function (b) { b.classList.toggle('is-active', b === btn); });
-      var i = 0;
-      tiles.forEach(function (t) {
-        var hide = cat !== 'all' && t.dataset.cat !== cat;
-        t.classList.toggle('is-hidden', hide);
-        if (!hide) t.style.setProperty('--i', i++);
+  /* ---------- Reveal on scroll ---------- */
+  var rv = $$('.rv');
+  if ('IntersectionObserver' in window && !REDUCED) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
       });
-    });
-  });
+    }, { rootMargin: '0px 0px -8% 0px' });
+    rv.forEach(function (el) { io.observe(el); });
+  } else {
+    rv.forEach(function (el) { el.classList.add('is-in'); });
+  }
 
-  /* ---------- FAQ accordion ---------- */
-  $$('.faq__item').forEach(function (item) {
-    var q = $('.faq__q', item), a = $('.faq__a', item);
-    if (!q || !a) return;
-    q.addEventListener('click', function () {
-      var open = item.classList.contains('is-open');
-      $$('.faq__item').forEach(function (o) {
-        o.classList.remove('is-open');
-        var oa = $('.faq__a', o), oq = $('.faq__q', o);
-        if (oa) oa.style.maxHeight = null;
-        if (oq) oq.setAttribute('aria-expanded', 'false');
+  /* ---------- Hero slides ---------- */
+  var slides = $('[data-slides]');
+  if (slides) {
+    var imgs = $$('img', slides), dots = $$('.hero__dots button', slides), cur = 0, timer;
+    var show = function (i) {
+      imgs[cur].classList.remove('is-on'); dots[cur].removeAttribute('aria-current');
+      cur = (i + imgs.length) % imgs.length;
+      imgs[cur].classList.add('is-on'); dots[cur].setAttribute('aria-current', 'true');
+    };
+    var play = function () { if (!REDUCED) { clearInterval(timer); timer = setInterval(function () { show(cur + 1); }, 6000); } };
+    dots.forEach(function (d, i) { d.addEventListener('click', function () { show(i); play(); }); });
+    play();
+  }
+
+  /* ---------- Project rail ---------- */
+  var rail = $('#rail');
+  if (rail) {
+    $$('[data-rail]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var step = rail.firstElementChild.getBoundingClientRect().width + 20;
+        rail.scrollBy({ left: step * Number(b.dataset.rail), behavior: REDUCED ? 'auto' : 'smooth' });
       });
-      if (!open) {
-        item.classList.add('is-open');
-        a.style.maxHeight = a.scrollHeight + 'px';
-        q.setAttribute('aria-expanded', 'true');
-      }
     });
-  });
-  window.addEventListener('resize', function () {
-    var open = $('.faq__item.is-open .faq__a');
-    if (open) open.style.maxHeight = open.scrollHeight + 'px';
-  });
+  }
+
+  /* ---------- Package cards ---------- */
+  var tierHTML = function (p, i, inner) {
+    return '<span class="tier__tag">Package ' + String.fromCharCode(65 + i) + '</span>' +
+      (p.featured ? '<span class="tier__flag">Most popular</span>' : '') +
+      '<h3>' + esc(p.name) + '</h3>' +
+      '<p class="tier__sum">' + esc(p.summary) + '</p>' +
+      '<div class="tier__price"><small>From</small>' + money(p.from) + '</div>' +
+      '<ul>' + p.includes.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' + inner;
+  };
+
+  var teaser = $('#teaser');
+  if (teaser && DATA) {
+    teaser.innerHTML = DATA.packages.map(function (p, i) {
+      return '<article class="tier rv' + (p.featured ? ' is-featured' : '') + '">' +
+        tierHTML(p, i, '<a class="btn' + (p.featured ? ' btn--solid' : '') + '" href="packages.html?p=' + p.id + '#customise">Customise ' + ARROW + '</a>') +
+        '</article>';
+    }).join('');
+    $$('.rv', teaser).forEach(function (el) { el.classList.add('is-in'); });
+  }
 
   /* ======================================================================
-     9. ENQUIRY FORM
+     CONFIGURATOR
+     State lives in the URL (?p=b&f=dark&o=bench,rain) so a build can be
+     shared, bookmarked and sent with the enquiry.
      ====================================================================== */
-  var form = $('#form');
-  if (!form) return;
-  var msg = $('#formMsg'), btn = $('#submitBtn');
+  var tiersEl = $('#tiers');
+  var buildText = '';
+  if (tiersEl && DATA) {
+    var state = { pkg: null, single: {}, multi: {} };
+    var pkgById = function (id) { return DATA.packages.filter(function (p) { return p.id === id; })[0] || null; };
+    var priceOf = function (opt) {
+      if (!state.pkg) return typeof opt.price === 'number' ? opt.price : null;
+      if (typeof opt.price === 'number') return opt.price;
+      var v = opt.price[state.pkg.id];
+      return v === undefined ? null : v;
+    };
 
-  var setMsg = function (text, ok) {
-    if (!msg) return;
-    msg.textContent = text;
-    msg.className = 'form__msg ' + (ok ? 'is-ok' : 'is-err');
-    msg.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  };
-  var fieldOf = function (el) { return el.closest('.field') || el.closest('.consent'); };
+    // defaults for single-choice groups
+    DATA.groups.forEach(function (g) { if (g.type === 'single') state.single[g.id] = g.options[0].id; });
 
-  var validate = function () {
-    var ok = true, firstBad = null;
-    $$('[required]', form).forEach(function (el) {
-      var wrap = fieldOf(el);
-      var good = el.type === 'checkbox' ? el.checked : el.value.trim() !== '';
-      if (good && el.type === 'email') good = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(el.value.trim());
-      if (good && el.type === 'tel') good = el.value.replace(/[^0-9]/g, '').length >= 7;
-      if (wrap) wrap.classList.toggle('has-error', !good);
-      if (!good) { ok = false; if (!firstBad) firstBad = el; }
-    });
-    if (firstBad) firstBad.focus();
-    return ok;
-  };
-
-  $$('[required]', form).forEach(function (el) {
-    el.addEventListener(el.type === 'checkbox' ? 'change' : 'input', function () {
-      var wrap = fieldOf(el);
-      if (wrap) wrap.classList.remove('has-error');
-    });
-  });
-
-  var mailtoFallback = function (d) {
-    var lines = [
-      'Name: ' + d.name, 'Phone: ' + d.phone, 'Email: ' + d.email,
-      'Postcode: ' + d.postcode, 'Project: ' + d.project,
-      'Budget: ' + d.budget, 'Start: ' + d.timing, '',
-      'About the project:', d.message || '(none given)'
-    ].join('\n');
-    window.location.href = 'mailto:' + CONTACT_EMAIL +
-      '?subject=' + encodeURIComponent('Consultation request from ' + d.name) +
-      '&body=' + encodeURIComponent(lines);
-  };
-
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
-    if (!validate()) { setMsg('Please check the highlighted fields and try again.', false); return; }
-
-    var fd = new FormData(form), data = {};
-    fd.forEach(function (v, k) { data[k] = v; });
-
-    if (data.company) { setMsg('Thank you. Your request has been sent.', true); form.reset(); return; }
-
-    if (!FORM_ENDPOINT) {
-      if (CONTACT_EMAIL) {
-        mailtoFallback(data);
-        setMsg('Opening your email app to send this enquiry…', true);
-      } else {
-        setMsg('This form is not connected yet. Set FORM_ENDPOINT or CONTACT_EMAIL in assets/js/main.js.', false);
+    // restore from URL
+    var q = new URLSearchParams(location.search);
+    state.pkg = pkgById(q.get('p'));
+    DATA.groups.forEach(function (g) {
+      if (g.type === 'single') {
+        var want = q.get(g.id);
+        if (g.options.some(function (o) { return o.id === want; })) state.single[g.id] = want;
       }
-      return;
+    });
+    (q.get('o') || '').split(',').forEach(function (id) { if (id) state.multi[id] = true; });
+
+    // build package buttons
+    tiersEl.innerHTML = DATA.packages.map(function (p, i) {
+      return '<button type="button" class="tier' + (p.featured ? ' is-featured' : '') + '" data-pkg="' + p.id + '" aria-pressed="false">' +
+        tierHTML(p, i, '<span class="tier__pick">Choose ' + esc(p.name) + '</span>') + '</button>';
+    }).join('');
+
+    // build option groups
+    $('#groups').innerHTML = DATA.groups.map(function (g) {
+      return '<fieldset class="ogroup"><legend><h3>' + esc(g.title) + '</h3></legend><div class="opts">' +
+        g.options.map(function (o) {
+          var type = g.type === 'single' ? 'radio' : 'checkbox';
+          return '<label class="opt" data-type="' + g.type + '" data-opt="' + o.id + '">' +
+            '<input type="' + type + '" name="' + (g.type === 'single' ? g.id : o.id) + '" value="' + o.id + '">' +
+            '<span class="opt__box">' + TICK + '</span>' +
+            '<span class="opt__txt"><span class="opt__name">' + esc(o.name) + '</span><span class="opt__note">' + esc(o.note) + '</span></span>' +
+            '<span class="opt__price"></span></label>';
+        }).join('') + '</div></fieldset>';
+    }).join('');
+
+    var optEls = {};
+    $$('.opt').forEach(function (el) { optEls[el.dataset.opt] = el; });
+    $$('[data-sum-note]').forEach(function (el) { el.textContent = DATA.note; });
+
+    var syncURL = function () {
+      if (!state.pkg) return;
+      var p = new URLSearchParams();
+      p.set('p', state.pkg.id);
+      DATA.groups.forEach(function (g) {
+        if (g.type === 'single' && state.single[g.id] !== g.options[0].id) p.set(g.id, state.single[g.id]);
+      });
+      var picked = Object.keys(state.multi).filter(function (k) { return state.multi[k]; });
+      if (picked.length) p.set('o', picked.join(','));
+      history.replaceState(null, '', location.pathname + '?' + p.toString().replace(/%2C/g, ',') + location.hash);
+    };
+
+    var render = function () {
+      var has = !!state.pkg;
+      $('#cfg').classList.toggle('is-locked', !has);
+      $('#cfg-hint').textContent = has
+        ? 'Included items are already ticked. Add anything else you want.'
+        : 'Choose a package above first.';
+      $$('[data-pkg]').forEach(function (b) { b.setAttribute('aria-pressed', has && b.dataset.pkg === state.pkg.id); });
+
+      var total = has ? state.pkg.from : 0;
+      var lines = [], text = [];
+      if (has) {
+        lines.push([state.pkg.name + ' package', money(state.pkg.from)]);
+        text.push('Package: ' + state.pkg.name + ' (from ' + money(state.pkg.from) + ')');
+      }
+
+      DATA.groups.forEach(function (g) {
+        g.options.forEach(function (o) {
+          var el = optEls[o.id], input = $('input', el), p = priceOf(o);
+          el.hidden = p === null;
+          if (p === null) { input.checked = false; return; }
+          var incl = p === 0;
+          var on;
+          if (g.type === 'single') {
+            on = state.single[g.id] === o.id;
+            input.checked = on;
+            el.classList.remove('is-incl');
+            $('.opt__price', el).textContent = incl ? 'Included' : '+' + money(p);
+            if (on) {
+              lines.push([g.title + ': ' + o.name, incl ? 'Included' : '+' + money(p)]);
+              text.push(g.title + ': ' + o.name + (incl ? '' : ' (+' + money(p) + ')'));
+            }
+          } else {
+            on = incl || !!state.multi[o.id];
+            input.checked = on;
+            input.disabled = incl;
+            el.classList.toggle('is-incl', incl);
+            $('.opt__price', el).textContent = incl ? 'Included' : '+' + money(p);
+            if (on && !incl) {
+              lines.push([o.name, '+' + money(p)]);
+              text.push('+ ' + o.name + ' (' + money(p) + ')');
+            }
+          }
+          if (on && has) total += p;
+        });
+      });
+
+      $$('[data-sum-name]').forEach(function (el) { el.textContent = has ? state.pkg.name : 'No package yet'; });
+      $$('[data-sum-total]').forEach(function (el) { el.textContent = money(total); });
+      var ul = $('[data-sum-lines]');
+      ul.innerHTML = lines.length
+        ? lines.map(function (l) { return '<li><span>' + esc(l[0]) + '</span><span>' + esc(l[1]) + '</span></li>'; }).join('')
+        : '<li class="is-empty">Choose a package to start.</li>';
+
+      $$('.steps a').forEach(function (a) {
+        var n = Number(a.dataset.step);
+        a.classList.toggle('is-done', (n === 1 && has) || (n === 2 && has && lines.length > 2));
+      });
+      $('.pbar').classList.toggle('has-pkg', has);
+      updateBar();
+
+      buildText = has ? text.concat(['Guide price: ' + money(total)]).join('\n') : 'No package selected';
+      syncURL();
+    };
+
+    tiersEl.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-pkg]');
+      if (!b) return;
+      var first = !state.pkg;
+      state.pkg = pkgById(b.dataset.pkg);
+      render();
+      if (first || window.innerWidth < 1080) {
+        $('#customise').scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth' });
+      }
+    });
+
+    $('#groups').addEventListener('change', function (e) {
+      var input = e.target, el = input.closest('.opt');
+      if (!el) return;
+      if (input.type === 'radio') state.single[input.name] = input.value;
+      else state.multi[input.value] = input.checked;
+      render();
+    });
+
+    // share
+    var share = $('[data-share]');
+    share.addEventListener('click', function () {
+      var url = location.href.split('#')[0];
+      var done = function () { share.textContent = 'Link copied'; setTimeout(function () { share.textContent = 'Copy link to this build'; }, 2000); };
+      if (navigator.clipboard) navigator.clipboard.writeText(url).then(done, function () { window.prompt('Copy this link', url); });
+      else window.prompt('Copy this link', url);
+    });
+
+    // mobile price bar: visible once a package is chosen, hidden over the form
+    var bar = $('.pbar'), sendVisible = false, topVisible = true;
+    var updateBar = function () { bar.classList.toggle('is-on', bar.classList.contains('has-pkg') && !sendVisible && !topVisible); };
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (es) { sendVisible = es[0].isIntersecting; updateBar(); }).observe($('#send'));
+      new IntersectionObserver(function (es) { topVisible = es[0].isIntersecting; updateBar(); }).observe($('.cfg-hero'));
     }
 
-    btn.disabled = true;
-    var labelEl = btn.querySelector('.btn__t') || btn;
-    var label = labelEl.textContent;
-    labelEl.textContent = 'Sending…';
+    render();
+  }
 
-    fetch(FORM_ENDPOINT, { method: 'POST', body: fd, headers: { Accept: 'application/json' } })
-      .then(function (r) {
-        if (!r.ok) throw new Error('Bad response');
-        form.reset();
-        setMsg('Thank you. Your request has been sent. We will be in touch shortly.', true);
-      })
-      .catch(function () {
-        setMsg('Something went wrong sending that. Please try again, or reach us on Instagram @custombyunicks.', false);
-      })
-      .then(function () { btn.disabled = false; labelEl.textContent = label; });
+  /* ---------- Forms ---------- */
+  $$('[data-form]').forEach(function (form) {
+    var msg = $('.form__msg', form), btn = $('[type="submit"]', form);
+
+    var setMsg = function (text) {
+      msg.textContent = text;
+      msg.classList.add('is-on');
+      msg.scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'center' });
+    };
+
+    var validate = function () {
+      var firstBad = null;
+      $$('[required]', form).forEach(function (el) {
+        var v = el.value.trim(), good = v !== '';
+        if (good && el.type === 'email') good = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+        if (good && el.type === 'tel') good = v.replace(/\D/g, '').length >= 7;
+        el.closest('.field').classList.toggle('is-bad', !good);
+        if (!good && !firstBad) firstBad = el;
+      });
+      if (firstBad) firstBad.focus();
+      return !firstBad;
+    };
+    $$('[required]', form).forEach(function (el) {
+      el.addEventListener('input', function () { el.closest('.field').classList.remove('is-bad'); });
+    });
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (form.hasAttribute('data-build')) {
+        form.elements.build.value = buildText;
+        form.elements.build_link.value = location.href.split('#')[0];
+      }
+      if (!validate()) return;
+
+      var fd = new FormData(form);
+      if (fd.get('company')) { form.reset(); setMsg('Thank you. We will be in touch shortly.'); return; }
+
+      if (!FORM_ENDPOINT) {
+        if (!CONTACT_EMAIL) { setMsg('This form is not connected yet. Set FORM_ENDPOINT or CONTACT_EMAIL in assets/js/main.js.'); return; }
+        var body = ['Name: ' + fd.get('name'), 'Phone: ' + fd.get('phone'), 'Email: ' + fd.get('email'),
+          'Postcode: ' + fd.get('postcode'), '', fd.get('message') || ''];
+        if (fd.get('build')) body.push('', '--- Build ---', fd.get('build'), fd.get('build_link'));
+        location.href = 'mailto:' + CONTACT_EMAIL + '?subject=' + encodeURIComponent('Enquiry from ' + fd.get('name')) +
+          '&body=' + encodeURIComponent(body.join('\n'));
+        setMsg('Opening your email app to send this…');
+        return;
+      }
+
+      var label = btn.textContent;
+      btn.disabled = true; btn.textContent = 'Sending…';
+      fetch(FORM_ENDPOINT, { method: 'POST', body: fd, headers: { Accept: 'application/json' } })
+        .then(function (r) {
+          if (!r.ok) throw new Error(r.status);
+          form.reset();
+          setMsg('Thank you. Your enquiry has been sent. We will be in touch shortly.');
+        })
+        .catch(function () { setMsg('Something went wrong. Please try again, or message us on Instagram @custombyunicks.'); })
+        .then(function () { btn.disabled = false; btn.textContent = label; });
+    });
   });
 })();
