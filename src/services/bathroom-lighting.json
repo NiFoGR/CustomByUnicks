@@ -1,0 +1,88 @@
+{
+  "slug": "bathroom-lighting",
+  "order": 8,
+  "nav": "Bathroom lighting",
+  "title": "Bathroom Lighting Design {{city}} | Layered LED Bathroom Lighting | UNICKS",
+  "description": "Bathroom lighting design in {{city}}: clear mirror light, warm dimmable LED in niches and plinths, correct IP ratings and drivers you can reach. Free survey.",
+  "h1": "Bathroom lighting design in {{city}}",
+  "lede": "Clear, flattering light at the mirror, soft warm light everywhere else, and an installation that is safe, compliant and easy to maintain for years.",
+  "summary": "Layered, dimmable LED lighting planned with your bathroom: clear task light at the mirror, warm ambient light, and accent light in niches, plinths and benches.",
+  "image": "project-star-dark",
+  "imageAlt": "Grey marble shower room lit by warm LED, with an under-lit stone bench, lit recessed niche, light line under a floating vanity, backlit mirror and stone wall sconce",
+  "sections": [
+    {
+      "h2": "Why bathroom lighting so often disappoints",
+      "html": "<p>Most bathrooms are lit by a grid of ceiling downlights on one switch. It looks fine on a plan, but it throws shadows down your face at the mirror, glares off polished stone and leaves the room either too bright at night or too dim in the morning.</p><p>Add a cool white LED strip that shows every individual dot, a mirror light with a different colour from the ceiling, and the most expensive surfaces in the room end up looking flat. Lighting is often the last thing decided in a bathroom, and it shows, in new builds and period homes across {{city}} alike.</p>"
+    },
+    {
+      "h2": "What gets expensive when it is done badly",
+      "html": "<p>The visual problems are only part of it. LED drivers have a working life, and when one is sealed behind tiles or plasterboard with no access, replacing it can mean cutting out a finished wall. A fitting with the wrong IP rating in a shower area can let in moisture and fail early, or become unsafe.</p><p>Electrical work in a bathroom is also regulated. Unnotified or untested work can cause problems when you sell the house and, more importantly, can put people at risk in the one room where water and electricity sit closest together.</p><p>Because cables, recesses and driver positions are fixed before the walls are tiled, the time to get lighting right is at the design stage, not after the stone is on.</p>"
+    },
+    {
+      "h2": "Three layers of light, each with a job",
+      "html": "<p>A well-lit bathroom uses several sources on separate circuits or channels, so you can choose the light that suits the moment.</p><h3>Task light at the mirror</h3><p>This is the light you shave, apply make-up and check your skin by, so it needs to light your face evenly from the front. A backlit mirror or a pair of wall lights either side of the mirror does this far better than a downlight overhead, which casts shadows under the eyes and chin.</p><h3>Ambient light</h3><p>General light for moving around and cleaning. This might be a small number of well-placed, low-glare downlights, wall sconces or a concealed cove. Positioning matters more than quantity: we avoid placing downlights directly over polished surfaces where you will see the reflection.</p><h3>Accent light</h3><p>This is what gives a stone bathroom its depth in the evening. LED lines in a recessed niche, under a floating vanity, beneath a built-in stone bench or around a plinth wash light across the marble and pick out the veining. On low settings, accent light alone is often enough for a relaxed bath or a night-time visit.</p>"
+    },
+    {
+      "h2": "Colour temperature and colour rendering",
+      "html": "<p>Colour temperature is measured in kelvin. Warm white in the 2700K to 3000K range is a common choice for bathrooms because it flatters skin and suits warm materials such as cream marble, timber and brushed brass. Cooler light can look clinical against stone and makes the room feel colder in the evening.</p><p>Whatever temperature you choose, every source in the room should match. A mirror at one colour and a niche at another is one of the most common reasons a finished bathroom feels slightly wrong, even when people cannot say why.</p><p>Colour rendering index, or CRI, describes how faithfully a light source shows colours compared with daylight. Low-CRI LEDs make skin look grey and marble look dull. For mirror lighting in particular, a high-CRI source, commonly specified at 90 or above, shows skin tones and make-up accurately.</p>"
+    },
+    {
+      "h2": "Zones, IP ratings and Part P, explained plainly",
+      "html": "<p>BS 7671, the UK wiring regulations, divides a bathroom into zones based on how likely each area is to get wet. The zone decides which fittings can go where.</p><ul><li><strong>Zone 0</strong> is inside the bath or shower tray itself. Only fittings designed for immersion, rated IPX7, and running at safety extra-low voltage are allowed.</li><li><strong>Zone 1</strong> is the space directly above the bath or shower, up to 2.25 metres from the floor. Fittings here need at least IPX4, and more where water jets are used.</li><li><strong>Zone 2</strong> extends 0.6 metres beyond zone 1, including the area around a basin close to the bath or shower. IPX4 is the usual minimum here too.</li></ul><p>Outside the zones, standard fittings are permitted, but we still use moisture-tolerant products in a room full of steam. All circuits in a bathroom also need protection by a residual current device.</p><p>The IP rating is a two-digit code. The first digit covers solids such as dust, the second covers water. A rating such as IP44 or IP65 tells you exactly how much protection a fitting has, which is why we check it for every light, mirror and switch on the plan.</p><p>In England, Part P of the Building Regulations makes new circuits, and additions or alterations to circuits within the bathroom zones, notifiable work. It must be done by a registered competent person who can self-certify, or be inspected by building control. {{ph:Our electrical work is carried out by a registered electrician who self-certifies under Part P}}, and you receive the test certificate when the job is complete.</p>"
+    },
+    {
+      "h2": "LED tape, profiles and drivers you can reach",
+      "html": "<p>The soft lines of light under a vanity or inside a niche come from LED tape, but tape on its own is rarely the right answer. We set it in an aluminium profile with a diffuser. The profile draws heat away from the LEDs, which helps them last, and the diffuser turns a row of bright dots into an even line. Where tape sits near water, the tape and profile are rated for that position.</p><p>Recesses for profiles are cut and planned before tiling, so the light sits flush in the stone rather than stuck on afterwards. That is one reason lighting and <a href=\"{{root}}services/stone-and-tiling/\">stone and tiling</a> are designed together: the tile layout decides where a line of light can run without an awkward cut.</p><p>Every LED circuit needs a driver to convert mains power. Drivers produce some heat and will eventually need replacing, so they must stay accessible. We place them in a ventilated vanity cabinet, a nearby cupboard, a loft or behind a discreet access panel outside the wet zones, and mark every position on the as-built drawings we hand over. Nothing that may need servicing is sealed behind stone.</p>"
+    },
+    {
+      "h2": "Dimming, scenes and the mirror",
+      "html": "<p>Dimming is what makes layered light usable. Drivers and dimmers have to be compatible, otherwise LEDs flicker or hum at low levels, so we specify them as a set. Simple scene control lets one press give you bright, even light in the morning and a low, warm glow in the evening.</p><ul><li><strong>Morning:</strong> mirror light and ambient light at full, accents on.</li><li><strong>Evening:</strong> ambient light low or off, niche, bench and vanity lines dimmed.</li><li><strong>Night:</strong> a low plinth or under-vanity light on a sensor, so you are not blinded at 3am.</li></ul><p>A demisting mirror has a low-power heated pad behind the glass that keeps the area in front of you clear after a shower. It is usually wired to come on with the mirror light or the extractor, so you never have to remember it. Backlit mirrors need the right IP rating for their position and a planned supply point, so they are fixed in the design early.</p><p>Lighting is part of every room we plan through our <a href=\"{{root}}services/bathroom-design/\">bathroom design</a> service. If you would like a lighting plan for a bathroom in {{city}}, <a href=\"{{root}}contact/\">book a free survey</a>, and we will give you a fixed written quote.</p>"
+    }
+  ],
+  "included": [
+    "Lighting plan with task, ambient and accent layers",
+    "Fittings matched to bathroom zones and IP ratings",
+    "Warm, high-CRI LED at the mirror and vanity",
+    "LED tape in aluminium profiles with diffusers",
+    "Recesses planned into stone before tiling",
+    "Accessible driver positions and access panels",
+    "Compatible dimming and simple scene control",
+    "Backlit and demisting mirror supply",
+    "Electrical installation, testing and certification"
+  ],
+  "faqs": [
+    {
+      "q": "What colour temperature is best for bathroom lighting?",
+      "a": "Warm white between 2700K and 3000K is a common choice for bathrooms. It flatters skin, suits marble, timber and brass, and feels calm in the evening. Some people prefer slightly cooler light at the mirror for make-up, but every source in the room should still match closely. Mixing colour temperatures is one of the main reasons a bathroom looks uneven once it is finished."
+    },
+    {
+      "q": "What IP rating do bathroom lights need?",
+      "a": "It depends on the zone. Fittings inside the bath or shower tray need IPX7 and must run at safety extra-low voltage. Above the bath or shower, and in the area just around it, IPX4 is the usual minimum, with higher ratings where water jets are used. Outside the zones, standard fittings are allowed, though moisture-resistant ones are still sensible in a steamy room."
+    },
+    {
+      "q": "Do I need an electrician for bathroom lighting?",
+      "a": "Yes. In England, new circuits and additions or alterations to circuits within the bathroom zones are notifiable under Part P of the Building Regulations. The work must be done by a registered competent person who can self-certify, or be inspected by building control. You should receive an electrical certificate when the work is finished, and it is worth keeping with your house documents."
+    },
+    {
+      "q": "Can LED strip lights go in a shower niche?",
+      "a": "Yes, if the tape and its profile are rated for that position and the system runs at extra-low voltage from a driver placed safely outside the wet area. The tape sits in an aluminium profile with a diffuser, recessed into the niche before tiling, so the light is even and the edges are sealed. Planning the niche and tile layout together gives the neatest result."
+    },
+    {
+      "q": "Where should the LED driver go in a bathroom?",
+      "a": "Somewhere dry, ventilated and accessible. Good positions include inside a vanity cabinet, an adjacent cupboard, a loft space or behind an access panel outside the bathroom zones. Drivers will eventually need replacing, so they should never be sealed behind tiles or plasterboard. Ask for every driver position to be marked on a drawing when the job is handed over."
+    },
+    {
+      "q": "Are demisting mirrors worth it?",
+      "a": "For most people, yes. A heated pad behind the glass keeps the mirror clear after a shower, so you can use it straight away without wiping. The pad uses little power and is usually wired to switch on with the mirror light or the extractor fan. It needs a planned supply point, so it is easiest to include at the design stage rather than add later."
+    },
+    {
+      "q": "How many downlights does a bathroom need?",
+      "a": "There is no fixed number, and more is rarely better. A small number of well-placed, low-glare downlights for general light, combined with proper mirror lighting and some accent light, usually works far better than a full grid. Avoid placing downlights directly above the mirror or over polished stone, where they cause shadows and reflections."
+    }
+  ],
+  "related": [
+    "stone-and-tiling",
+    "bathroom-design",
+    "walk-in-showers"
+  ]
+}

@@ -1,0 +1,67 @@
+<form class="form" data-form novalidate>
+  <div class="form__msg" role="status" aria-live="polite" tabindex="-1"></div>
+  <div class="form__row">
+    <div class="field">
+      <label for="f-name">Name</label>
+      <input id="f-name" name="name" autocomplete="name" required>
+      <span class="field__err">Please add your name.</span>
+    </div>
+    <div class="field">
+      <label for="f-phone">Phone</label>
+      <input id="f-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required>
+      <span class="field__err">Please add a phone number.</span>
+    </div>
+  </div>
+  <div class="form__row">
+    <div class="field">
+      <label for="f-email">Email</label>
+      <input id="f-email" name="email" type="email" autocomplete="email" required>
+      <span class="field__err">Please check your email address.</span>
+    </div>
+    <div class="field">
+      <label for="f-post">Postcode</label>
+      <input id="f-post" name="postcode" autocomplete="postal-code" autocapitalize="characters" required>
+      <span class="field__err">We need this to check we cover you.</span>
+    </div>
+  </div>
+  <div class="form__row">
+    <div class="field">
+      <label for="f-room">Room</label>
+      <select id="f-room" name="room">
+        <option>Full bathroom</option>
+        <option>En-suite</option>
+        <option>Wet room</option>
+        <option>Shower room</option>
+        <option>Cloakroom</option>
+        <option>More than one room</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="f-source">How did you find us?</label>
+      <select id="f-source" name="source">
+        <option value="">Choose one</option>
+        <option>Google search</option>
+        <option>Google Maps</option>
+        <option>Instagram</option>
+        <option>Recommended by someone</option>
+        <option>Saw your work in person</option>
+        <option>Other</option>
+      </select>
+    </div>
+  </div>
+  <div class="field">
+    <label for="f-msg">About the room <span class="opt">(optional)</span></label>
+    <textarea id="f-msg" name="message" rows="4" placeholder="Size, timing, anything that has to stay or go"></textarea>
+  </div>
+  <input type="hidden" name="build">
+  <input type="hidden" name="build_link">
+  <input type="hidden" name="page">
+  <input type="hidden" name="utm">
+  <div class="hp" aria-hidden="true"><label>Company <input name="company" tabindex="-1" autocomplete="off"></label></div>
+  <label class="consent">
+    <input type="checkbox" name="consent" required>
+    <span>I'm happy for UNICKS to contact me about this enquiry. See our <a href="{{root}}privacy/">privacy notice</a>.</span>
+  </label>
+  <button class="btn btn--solid btn--block" type="submit">Send my enquiry</button>
+  <p class="form__note">We reply within {{reply}}. Your details are only used to answer this enquiry.</p>
+</form>

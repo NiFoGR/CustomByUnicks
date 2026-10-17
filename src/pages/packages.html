@@ -1,0 +1,96 @@
+<!--{
+  "path": "packages/",
+  "nav": "packages",
+  "title": "Bathroom Packages & Prices {{city}} | Build Your Bathroom | UNICKS",
+  "description": "Choose a UNICKS bathroom package, tick the upgrades you want and see a guide price instantly. Then book a free survey for your fixed, itemised quote.",
+  "scripts": ["packages-data.js"],
+  "crumbs": [["Home", ""], ["Packages", "packages/"]]
+}-->
+<header class="pagehead">
+  <div class="wrap">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="{{root}}">Home</a><span>/</span><span aria-current="page">Packages</span></nav>
+    <h1 data-hero>Bathroom packages and prices</h1>
+    <p class="lede" data-hero>Choose a starting point, tick what you want, and see a guide price as you go. No email needed to see it.</p>
+    <ol class="stepper" data-hero aria-label="Three steps">
+      <li><a href="#choose" data-step="1"><b>1</b>Package</a></li>
+      <li><a href="#customise" data-step="2"><b>2</b>Options</a></li>
+      <li><a href="#send" data-step="3"><b>3</b>Send</a></li>
+    </ol>
+  </div>
+</header>
+
+<section class="cfg-step" id="choose">
+  <div class="wrap">
+    <h2 class="cfg-step__h"><span>Step 1</span>Choose your package</h2>
+    <div class="tiers" id="tiers" role="group" aria-label="Packages">{{tiers_pick}}</div>
+  </div>
+</section>
+
+<section class="cfg-step" id="customise">
+  <div class="wrap">
+    <h2 class="cfg-step__h"><span>Step 2</span>Tick what you want</h2>
+    <p class="cfg-step__hint" id="cfg-hint">Choose a package above first.</p>
+    <div class="cfg is-locked" id="cfg">
+      <div id="groups">{{option_groups}}</div>
+      <aside class="summary" aria-label="Your bathroom">
+        <div class="summary__head">
+          <small>Your bathroom</small>
+          <strong data-sum-name>No package yet</strong>
+        </div>
+        <ul class="summary__lines" data-sum-lines><li class="is-empty">Choose a package to start.</li></ul>
+        <div class="summary__total">
+          <span>Guide price</span>
+          <strong data-sum-total aria-live="polite">&pound;0</strong>
+        </div>
+        <div class="summary__foot">
+          <a href="#send" class="btn btn--solid btn--block">Send to UNICKS</a>
+          <button type="button" class="summary__share" data-share>Copy a link to this</button>
+          <p class="summary__note">{{price_note}}</p>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<section class="cfg-step" id="send">
+  <div class="wrap split split--form">
+    <div>
+      <h2 class="cfg-step__h"><span>Step 3</span>Send it to us</h2>
+      <p class="lede">We reply within {{reply}} to arrange a free survey. Your choices come with your message, so we arrive prepared.</p>
+      <ol class="next">
+        <li><b>Survey</b><span>We visit, measure and talk it through. Free, no obligation.</span></li>
+        <li><b>Fixed quote</b><span>Every item priced in writing. Changes are only made with your written approval.</span></li>
+        <li><b>Build</b><span>One team from strip-out to final seal, backed by {{guarantee}}.</span></li>
+      </ol>
+    </div>
+    {{include_form}}
+  </div>
+</section>
+
+<section class="section section--alt">
+  <div class="wrap narrow">
+    <div class="head head--center" data-rv>
+      <p class="eyebrow">Good to know</p>
+      <h2>About the prices</h2>
+    </div>
+    <div class="faq">
+      <details class="faq__item"><summary>Is the price on screen what I pay?</summary>
+<div class="faq__a"><p>It is a guide for a typical bathroom of around 5m&sup2;. After the free survey you get a fixed, itemised quote based on your actual room, and that is the price you pay. Nothing changes without your written approval.</p></div>
+</details>
+      <details class="faq__item"><summary>My room is larger or an unusual shape.</summary>
+<div class="faq__a"><p>Choose the package closest to what you want and send it anyway. We adjust for size, layout and anything structural at the survey, and explain every difference in writing.</p></div>
+</details>
+      <details class="faq__item"><summary>Can I have something that is not listed?</summary>
+<div class="faq__a"><p>Yes. Mention it in your message. Every room we build is designed for that house; the packages are simply the fastest way to show what things cost.</p></div>
+</details>
+      <details class="faq__item"><summary>What is not included?</summary>
+<div class="faq__a"><p>Structural work, moving soil stacks, replacing a boiler and redecorating outside the bathroom are quoted separately if you need them. If we find anything at the survey, you hear about it before you see a quote, not after.</p></div>
+</details>
+    </div>
+  </div>
+</section>
+
+<div class="pbar" aria-hidden="true">
+  <div><small data-sum-name>No package yet</small><strong data-sum-total>&pound;0</strong></div>
+  <a href="#send" class="btn btn--solid" tabindex="-1">Send</a>
+</div>

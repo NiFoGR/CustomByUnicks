@@ -1,0 +1,88 @@
+{
+  "slug": "bathroom-renovation",
+  "order": 1,
+  "nav": "Bathroom renovation",
+  "title": "Bathroom Renovation {{city}} | Luxury Bathroom Fitters | UNICKS",
+  "description": "Bathroom renovation in {{city}} from strip-out to final seal. One team designs and builds, waterproofs properly and gives a fixed written quote after a survey.",
+  "h1": "Luxury bathroom renovation in {{city}}",
+  "lede": "A full renovation from strip-out to final seal, designed and fitted by one team, with a fixed written quote before any work starts. You get a bathroom built properly behind the tiles, not only finished well on the surface.",
+  "summary": "Complete bathroom renovation from strip-out to final seal. One team designs and builds, with a fixed written quote after a free survey.",
+  "image": "project-brass-suite",
+  "imageAlt": "Marble bathroom with a freestanding bath, brushed brass ladder towel radiator and warm lit shelving niches",
+  "sections": [
+    {
+      "h2": "Where bathroom renovations usually go wrong",
+      "html": "<p>Most failed bathrooms look fine on the day the fitter leaves. The problems sit behind the tiles: a shower area that was never properly waterproofed, plasterboard used where it should not be, a timber floor that flexes every time someone steps out of the bath.</p><p>Then the signs arrive slowly. Grout cracks along one line. Silicone turns black within a year. A brown stain appears on the ceiling below. By the time you see it, water has often been getting in for months.</p><p>The other common failure is coordination. A typical renovation needs a plumber, an electrician, a plasterer, a tiler and a joiner. When each one is booked separately, nobody owns the sequence, and small decisions made in the wrong order (a valve set at the wrong height, a niche that lands on a tile joint) become permanent.</p>"
+    },
+    {
+      "h2": "Why it matters more than it looks",
+      "html": "<p>A leak behind a tiled wall is rarely a small repair. Fixing it usually means taking off the tiles, replacing the board behind them, drying out the structure and retiling, often with tiles that are no longer made. If the water has reached a ceiling or the joists, the cost grows again.</p><p>Damp also brings mould, which is hard to clear once it is inside a wall or under a floor. And poor workmanship shows in the finish: uneven tile edges catch the light, cuts at the edge of a wall look accidental, and a room that was meant to feel calm looks tired within a few years.</p><p>A bathroom costs more per square metre than almost any other room in a house. It should be built to last as long as the materials in it.</p>"
+    },
+    {
+      "h2": "How we renovate your bathroom, from strip-out to final seal",
+      "html": "<p>One team designs and builds your bathroom, so the people who drew the layout are answerable for how it is installed. The work follows a fixed order.</p><ol><li><strong>Survey and design.</strong> We measure the room and check the water pressure, the floor structure and the route for extraction, then design the layout around how you use it.</li><li><strong>Fixed written quote.</strong> You receive a written price for the agreed scope before anything is booked.</li><li><strong>Strip-out and protection.</strong> We protect the route through your home, remove the old suite and finishes, and take the room back to a sound structure.</li><li><strong>First fix.</strong> Pipework, waste, wiring, extraction ducting, wall-hung WC frames and concealed valves go in, with access planned for everything that may need servicing later.</li><li><strong>Substrates and waterproofing.</strong> Walls and floors are boarded, levelled and tanked where needed, then checked before tiling.</li><li><strong>Tiling and stonework.</strong> Tiles are set out from the centre lines of the room and its key features, so cuts are balanced at both ends.</li><li><strong>Second fix and final seal.</strong> Sanitaryware, brassware, lighting and glass are fitted, joints are sealed, natural stone is sealed and you are shown how to look after it.</li></ol><p>Each stage is explained in more detail on our <a href=\"{{root}}process/\">how we work</a> page.</p>"
+    },
+    {
+      "h2": "What happens behind the tiles",
+      "html": "<p>This is the part of a renovation you will never see once it is finished, and it is where most of the quality lives.</p><h3>Waterproofing the whole wet zone</h3><p>Tiles and grout are not waterproof. Water passes through grout lines and reaches whatever is behind them. Around a shower, or a bath with a shower over it, we apply a tanking system to the walls and floor of the whole area that gets wet, not only the edge of the tray, with reinforcing tape in the corners and sealing collars around pipes. Standard plasterboard is not used in wet areas; we use cement-based or waterproof tile backer boards instead.</p><h3>A floor that does not move</h3><p>Many UK bathrooms have timber floors. Timber flexes, and tiles and grout do not, so a floor that moves will crack them. We check the joists and boards, add support or overlay with a suitable board where needed, and use a decoupling membrane under large tiles or stone so that small movements in the floor are not passed into the finish.</p><h3>Flatness and setting out</h3><p>Large-format porcelain and stone show every small unevenness, because light rakes across a long edge. Walls and floors are made flat before tiling, and tiles are laid with full adhesive coverage and a levelling system to keep lippage (one tile edge standing proud of the next) to a minimum. We follow the principles of BS 5385, the British Standard for wall and floor tiling, including movement joints at internal corners and where the floor meets the wall, finished with flexible sealant rather than grout.</p>"
+    },
+    {
+      "h2": "Electrics, ventilation and the regulations",
+      "html": "<p>Bathrooms are treated as special locations for electrical work. The space around a bath or shower is divided into zones: zone 0 is inside the bath or shower tray, zone 1 is the space directly above it, and zone 2 extends beyond that. Each zone has rules for what can be fitted there and how well it must be protected against water, shown by its IP rating.</p><p>That affects the details you will notice. Warm LED light in a shelving niche or under a vanity needs fittings rated for the zone they sit in, and a driver (the small unit that powers the LEDs) placed somewhere dry and reachable. We plan an access point for every driver, so replacing one later does not mean lifting a tile.</p><p>In England, much electrical work in a bathroom is notifiable under Part P of the Building Regulations, so it is carried out and certified by a qualified electrician. Extraction is covered by Part F, which sets a minimum extract rate for bathrooms. A fan that is undersized or badly ducted is the most common reason for mould on a bathroom ceiling, so we size and route it properly from the start.</p>"
+    },
+    {
+      "h2": "Specifying finishes that stay right",
+      "html": "<p>Natural marble is the material many people want in a bathroom, and it deserves honest advice. Marble is a relatively soft, calcium-based stone. Acidic cleaners, some toiletries and even lemon juice can dull a polished surface, and it can absorb oils and dyes if left unsealed. We seal it with an impregnating sealer on installation, recommend a pH-neutral cleaner, and suggest a honed finish on floors, where it is less slippery and wear shows less.</p><p>If you want the look with less upkeep, large-format stone-effect porcelain is a strong alternative, particularly in a busy family bathroom. We will show you both side by side.</p><p>Brushed brass works well from ladder towel radiators to thermostatic shower valves. A thermostatic valve holds the water temperature steady when someone runs a tap elsewhere in the house, which is both a comfort and a safety point. Whatever you choose, we confirm the shower will perform with your boiler or cylinder and water pressure before it is ordered.</p>"
+    },
+    {
+      "h2": "Your quote, timeline and guarantee",
+      "html": "<p>After a free survey in {{city}} or nearby, you receive a fixed written quote that sets out the scope, the finishes and what is and is not included. If something unforeseen is found once the old bathroom is out, such as rotten joists, we show you, explain the options and agree any change in writing before doing the work.</p><p>A full renovation typically takes {{ph:3 to 4 weeks}} on site, depending on the size of the room and the finishes chosen. Every bathroom we build is covered by {{guarantee}}.</p><p>If a level-access shower is part of your plans, our <a href=\"{{root}}services/wet-rooms/\">wet room design and installation</a> page explains the extra work involved. For an early idea of budget, try our <a href=\"{{root}}packages/\">bathroom price builder</a>, or <a href=\"{{root}}contact/\">book a survey</a> of your home in {{city}}.</p>"
+    }
+  ],
+  "included": [
+    "Free survey and measured design",
+    "Fixed written quote before work starts",
+    "Strip-out, protection of your home and removal of old fittings",
+    "Plumbing, waste and first-fix electrics",
+    "Tanking and tile backer boards in all wet areas",
+    "Floor stiffening and decoupling membrane where needed",
+    "Tiling and natural stone to BS 5385 principles",
+    "Lighting, extraction and accessible LED drivers",
+    "Sanitaryware, brassware and glass fitted, stone sealed"
+  ],
+  "faqs": [
+    {
+      "q": "How long does a full bathroom renovation take?",
+      "a": "The time on site depends on the size of the room, how much structural work is needed and the finishes. A straightforward renovation is quicker than one with a wet room, underfloor heating or natural stone that needs templating. Your written quote includes an expected timeline, and we order long-lead items such as made-to-measure glass or stone early, so the room is not left half finished waiting for parts."
+    },
+    {
+      "q": "Do I need building regulations approval for a bathroom renovation?",
+      "a": "Replacing a bathroom like for like does not usually need approval, but parts of the work are covered by the Building Regulations. In England, much electrical work in a bathroom is notifiable under Part P, new extraction must meet Part F, and changes to drainage or structure can involve building control. We tell you at survey which parts apply to your project and make sure the right certificates are provided at the end."
+    },
+    {
+      "q": "Can I stay at home during a bathroom renovation?",
+      "a": "Most people do. The main disruption is noise and dust during strip-out, and a period without that bathroom. If it is your only bathroom, tell us at survey and we will plan the sequence to keep a working WC for as much of the project as we can, although there will usually be some days without one. We protect floors and the route through your home throughout."
+    },
+    {
+      "q": "Is marble a good choice for a bathroom?",
+      "a": "Yes, if you are happy with how it ages and how it needs to be cleaned. Marble is softer than porcelain and reacts with acids, so it can etch and mark. Sealed properly and cleaned with a pH-neutral product, it lasts very well and develops a gentle patina. For floors we usually suggest a honed finish for grip. If you want minimal upkeep, stone-effect porcelain gives a similar look."
+    },
+    {
+      "q": "Why do bathroom tiles crack?",
+      "a": "The most common cause is movement in the floor beneath. Timber floors flex, and if they are not stiffened, or the tiles are not laid on a decoupling membrane, that movement cracks grout and eventually tiles. Other causes include missing movement joints, poor adhesive coverage that leaves hollow spots, and heavy items dropped onto tiles with voids beneath them. Each of these is prevented during installation rather than fixed afterwards."
+    },
+    {
+      "q": "What is the difference between bathroom fitters and a design and build company?",
+      "a": "A fitter usually installs a design and products you have already chosen. A design and build team plans the layout, specifies the materials and then installs them, so one company is responsible for the whole result. The advantage is that decisions about valve heights, niche positions, lighting and tile setting out are made together before work starts, rather than on site by different trades."
+    },
+    {
+      "q": "How much does a bathroom renovation cost?",
+      "a": "Cost depends on the size of the room, how much needs to move and the finishes you choose. Natural stone, concealed cisterns, wall-hung furniture and built-in lighting all add labour as well as material cost. Our online price builder gives a guide for different specifications, and after a free survey you receive a fixed written quote for your room, so you know the price before work begins."
+    }
+  ],
+  "related": [
+    "wet-rooms",
+    "walk-in-showers",
+    "stone-and-tiling"
+  ]
+}
