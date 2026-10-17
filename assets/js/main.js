@@ -168,7 +168,7 @@ var CONTACT_EMAIL = '';
       $('#cfg').classList.toggle('is-locked', !has);
       $('#cfg-hint').textContent = has
         ? 'Included items are already ticked. Add anything else you want.'
-        : 'Choose a package above first.';
+        : 'Choose a package above to see the options.';
       $$('[data-pkg]').forEach(function (b) { b.setAttribute('aria-pressed', has && b.dataset.pkg === state.pkg.id); });
 
       var total = has ? state.pkg.from : 0;
@@ -190,6 +190,7 @@ var CONTACT_EMAIL = '';
             input.checked = on;
             el.classList.remove('is-incl');
             $('.opt__price', el).textContent = incl ? 'Included' : '+' + money(p);
+            $('.opt__price', el).classList.toggle('is-zero', incl);
             if (on) {
               lines.push([g.title + ': ' + o.name, incl ? 'Included' : '+' + money(p)]);
               text.push(g.title + ': ' + o.name + (incl ? '' : ' (+' + money(p) + ')'));
@@ -200,6 +201,7 @@ var CONTACT_EMAIL = '';
             input.disabled = incl;
             el.classList.toggle('is-incl', incl);
             $('.opt__price', el).textContent = incl ? 'Included' : '+' + money(p);
+            $('.opt__price', el).classList.toggle('is-zero', incl);
             if (on && !incl) {
               lines.push([o.name, '+' + money(p)]);
               text.push('+ ' + o.name + ' (' + money(p) + ')');

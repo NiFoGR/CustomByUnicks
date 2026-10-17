@@ -93,7 +93,7 @@ p:last-child{margin-bottom:0}
 }
 .hdr__in{height:100%;display:flex;align-items:center;gap:2rem}
 .brand{display:flex;align-items:center;gap:.7rem;flex:none}
-.brand img{width:40px;height:40px;object-fit:contain;mix-blend-mode:lighten}
+.brand img{width:40px;height:40px;object-fit:contain}
 .brand__name{display:block;font-family:var(--serif);font-size:1.5rem;letter-spacing:.32em;color:var(--gold);line-height:1}
 .brand__sub{display:block;font-size:.56rem;letter-spacing:.42em;color:var(--muted);text-transform:uppercase;margin-top:.3rem}
 .nav{display:flex;gap:2rem;margin-left:auto}
@@ -128,6 +128,7 @@ p:last-child{margin-bottom:0}
 .hero__media img.is-on{opacity:1;transform:scale(1)}
 .hero__media::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,var(--ink) 0,rgba(11,10,9,0) 22%)}
 .hero__dots{position:absolute;right:clamp(16px,3vw,40px);bottom:clamp(16px,3vw,36px);z-index:2;display:flex;gap:1.2rem}
+.hero__dots{padding:.2rem .9rem;background:rgba(11,10,9,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 .hero__dots button{font-size:.72rem;letter-spacing:.14em;color:var(--muted);padding:.5rem 0;border-bottom:1px solid transparent}
 .hero__dots button[aria-current="true"]{color:var(--text);border-color:var(--gold)}
 
@@ -136,11 +137,12 @@ p:last-child{margin-bottom:0}
 .door{position:relative;display:flex;align-items:flex-end;min-height:420px;overflow:hidden;isolation:isolate}
 .door + .door{border-left:1px solid var(--line-soft)}
 .door img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;transition:transform 1.2s var(--ease)}
-.door::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(11,10,9,.05) 25%,rgba(11,10,9,.92))}
+.door::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(11,10,9,.1) 0%,rgba(11,10,9,.55) 40%,rgba(11,10,9,.96) 85%)}
 .door:hover img{transform:scale(1.05)}
 .door__body{padding:clamp(24px,3vw,40px)}
 .door h3{text-transform:uppercase;font-size:clamp(1.6rem,2.4vw,2rem)}
-.door p{color:var(--muted);font-size:.95rem;margin:.6rem 0 1.1rem;max-width:30ch}
+.door p{color:#cfc8bd;font-size:.95rem;margin:.6rem 0 1.1rem;max-width:30ch;min-height:3.2em;text-shadow:0 1px 12px rgba(0,0,0,.6)}
+.door h3{text-shadow:0 1px 16px rgba(0,0,0,.5)}
 
 /* ---------- Pillars ---------- */
 .pillars{display:grid;grid-template-columns:repeat(3,1fr);padding-block:clamp(28px,4vw,44px)}
@@ -210,7 +212,7 @@ button.tier[aria-pressed="true"] .tier__pick{background:var(--gold);color:var(--
 /* ---------- Contact ---------- */
 .contact{display:grid;grid-template-columns:1fr 1.2fr;gap:clamp(32px,6vw,88px)}
 .contact__list{list-style:none;margin:2rem 0 0;padding:0;display:grid;gap:1.2rem}
-.contact__list li{display:grid;gap:.15rem}
+.contact__list li{display:grid;gap:.15rem;justify-items:start}
 .contact__list strong{font-weight:400;font-size:.68rem;letter-spacing:.24em;text-transform:uppercase;color:var(--muted-2)}
 .contact__list a:hover{color:var(--gold)}
 
@@ -258,7 +260,7 @@ button.tier[aria-pressed="true"] .tier__pick{background:var(--gold);color:var(--
 .cfg-step__head p{color:var(--muted);margin-top:.6rem}
 
 .cfg{display:grid;grid-template-columns:1fr 340px;gap:clamp(24px,4vw,56px);align-items:start}
-.cfg.is-locked{opacity:.35;pointer-events:none}
+.cfg.is-locked{display:none}
 
 .ogroup{border:0;margin:0;padding:0;min-width:0}
 .ogroup legend{padding:0}
@@ -281,6 +283,7 @@ button.tier[aria-pressed="true"] .tier__pick{background:var(--gold);color:var(--
 .opt input:checked + .opt__box svg{opacity:1}
 .opt input:focus-visible + .opt__box{outline:2px solid var(--gold-lt);outline-offset:3px}
 .opt.is-incl{cursor:default}
+.opt__price.is-zero{color:var(--muted-2);font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;margin-top:4px}
 .opt.is-incl .opt__price{color:var(--muted);font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;margin-top:3px}
 
 .summary{position:sticky;top:calc(var(--hdr) + 20px);background:var(--surface);border:1px solid var(--line)}
