@@ -339,6 +339,44 @@ button.tier[aria-pressed="true"] .tier__pick{background:var(--gold);color:var(--
   *{transition-duration:.01ms!important}
 }
 
+
+/* ==========================================================================
+   LIGHT MARBLE SECTIONS
+   The page starts dark (hero, entry cards) and turns to real marble as you
+   scroll. .tone-light swaps the colour variables, so every component inside
+   works unchanged. Textures: ambientCG Marble014 / Marble020 (CC0).
+   ========================================================================== */
+.tone-light{
+  --ink:#f4eee4;
+  --ink-2:#efe7da;
+  --surface:rgba(255,253,249,.84);
+  --surface-2:#fff;
+  --line:rgba(138,104,44,.32);
+  --line-soft:rgba(58,44,26,.14);
+  --gold:#9a7433;
+  --gold-lt:#7a5a22;
+  --text:#2b231a;
+  --muted:#5d5244;
+  --muted-2:#7d705e;
+  position:relative;color:var(--text);
+}
+.marble-cream{background:#f2ebe0 url(../img/marble-cream.jpg) center/1100px repeat}
+.marble-rose{background:#efe6e0 url(../img/marble-rose.jpg) center/1100px repeat}
+@media (hover:hover) and (min-width:981px){
+  .marble-cream,.marble-rose{background-attachment:fixed}
+}
+/* soft hand-over from the dark top of the page into the stone; the fade lives
+   only in the extra top padding, so it never sits behind text */
+.fade-top{padding-top:clamp(150px,16vw,220px)}
+.fade-top::before{content:"";position:absolute;left:0;right:0;top:0;height:clamp(120px,13vw,180px);pointer-events:none;background:linear-gradient(180deg,#0b0a09,rgba(11,10,9,0))}
+.fade-top > *{position:relative;z-index:1}
+.tone-light .tier,.tone-light .summary,.tone-light .opt,.tone-light .rail .work__img{box-shadow:0 18px 44px -26px rgba(64,44,18,.45)}
+.tone-light .tier,.tone-light .opt,.tone-light .summary{-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.tone-light .field input,.tone-light .field select,.tone-light .field textarea{background:rgba(255,253,249,.9)}
+.tone-light .field.is-bad input{border-color:#b04a3c}
+.tone-light .field__err{color:#a8443a}
+.tone-light ::selection{background:var(--gold);color:#fff}
+
 /* ---------- Responsive ---------- */
 @media (max-width:1080px){
   .nav{gap:1.4rem}
