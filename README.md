@@ -1,162 +1,96 @@
-# Unick's: Premium Bathroom Design & Installation
+# UNICKS: Luxury Bathrooms
 
-Marketing site for **Unick's** (`@custombyunicks`), a UK bathroom design-and-build
-company. Static HTML/CSS/JS, with no build step, no dependencies and no framework.
+Static site for **UNICKS** (`@custombyunicks`). Plain HTML/CSS/JS, no build step.
 
-Positioned as a portfolio-led site with a **free design consultation** as the primary
-call to action, following the pattern used by the leading UK firms in this trade
-(Hugo Oliver, The London Bath Co., North Arch, Ripples, West One).
-
----
-
-## Run it locally
-
-```bash
-python3 -m http.server 8000
-# open http://localhost:8000
+```
+index.html                 home: hero, three entry points, story, work, package teaser, contact
+packages.html              configurator: 1 choose package, 2 tick options, 3 send
+assets/js/packages-data.js packages, options and prices (the only file to edit for pricing)
+assets/js/main.js          menu, slides, configurator, forms
+assets/css/style.css       all styles, tokens in :root
+assets/img/                photography + mark.jpg (the US star monogram)
 ```
 
-Or just open `index.html` in a browser.
-
-## Deploy
-
-**GitHub Pages**: Settings → Pages → deploy from branch, root folder.
-(`.nojekyll` is committed so the `assets/` folder is served as-is.)
-
-**Netlify / Vercel / Cloudflare Pages**: drag the folder in, or connect the repo.
-No build command, publish directory is the repo root.
+Run locally: `python3 -m http.server 8000`, open http://localhost:8000.
 
 ---
 
-## Before it goes live
+## Packages and prices
 
-### 1. Connect the enquiry form
+Everything on the packages page is generated from `assets/js/packages-data.js`.
+The comment at the top of that file explains the format. In short:
 
-The form currently validates but has nowhere to send to. Open
-`assets/js/main.js` and fill in **one** of the two values at the top:
+- `price: 950` costs the same on every package.
+- `price: { a: 950, b: 0, c: 0 }` varies per package. `0` shows as **Included**
+  (pre-ticked and locked), `null` hides the option on that package.
+- `type: 'single'` groups are pick-one (first option is the default);
+  `type: 'multi'` groups are tick-any.
+
+**All current prices are placeholders.** Replace them before going live.
+
+A customer's build is kept in the URL (`packages.html?p=b&finish=dark&o=bench,rain`),
+so it can be shared, and the full list plus that link are sent with the enquiry.
+
+## Connect the forms
+
+GitHub Pages cannot process forms, so use a free form service. At the top of
+`assets/js/main.js`:
 
 ```js
-var FORM_ENDPOINT = '';   // e.g. 'https://formspree.io/f/xxxxxxx'
-var CONTACT_EMAIL = '';   // e.g. 'hello@custombyunicks.co.uk'
+var FORM_ENDPOINT = '';   // e.g. https://formspree.io/f/xxxx  (preferred)
+var CONTACT_EMAIL = '';   // mailto fallback only
 ```
 
-- `FORM_ENDPOINT`: a form service URL (Formspree, Basin, Getform, Netlify Forms).
-  Enquiries are POSTed there and the visitor stays on the page. **Preferred.**
-- `CONTACT_EMAIL`: fallback only. Opens the visitor's own email client, which
-  loses a meaningful share of enquiries. Use it as a stopgap.
+Formspree (50/month free) or Web3Forms (250/month free) both work as-is.
 
-A honeypot field is already in place, so form spam should be minimal.
+## Placeholders
 
-### 2. Replace the placeholders
-
-Anything still unknown is marked in the page with a gold dashed underline, so it is
-obvious in the browser. Search the source for `class="ph"` to find them all:
-
-| Placeholder | Where |
-|---|---|
-| `[Add your number]`, `[Add your email]` | Contact block + footer |
-| `[Add your areas]`, `[list your core areas]` | Contact block + FAQ |
-| `[X]`-year / `[X years]` guarantee | Trust strip + FAQ |
-| `[2–4 weeks]` typical build time | Process + FAQ |
-| `[£X,XXX]` starting price | FAQ |
-| `[24 hours]` response time | Consultation block |
-| `[Add your registration details…]` | FAQ, Part P / NICEIC / Gas Safe numbers |
-| `[Company no.]`, `[VAT no.]` | Footer |
-| Testimonials ×3 | Reviews section |
-
-**The three testimonials are deliberately empty.** They are structural placeholders,
-not draft copy. Do not publish invented reviews. Ask past clients for one at
-handover, which is when they are most willing to write it.
-
-### 3. Set the real domain
-
-`index.html` references `https://custombyunicks.co.uk/` in the canonical tag and
-the structured data. Update both if the domain differs.
+Unknowns are shown with a gold dashed underline: search the HTML for `class="ph"`
+(phone, email, areas, response time, build time, company number).
 
 ---
 
-## Photography
+## Hosting: GitHub Pages + Cloudflare, two domains
 
-The images in `assets/img/` were extracted from the company's own Instagram posts
-and story highlights, cropped to remove the Instagram interface and nothing else.
-They are placeholders in the sense that they are screenshot-resolution.
+Plan: **unicks.co.uk** is the real site. **unicksbathroom.co.uk** permanently
+redirects to it. GitHub Pages only serves one custom domain per repo, and one
+canonical domain is better for Google anyway.
 
-**Replace them with the original full-resolution files** when available. The three
-small square tiles (`grid-*.jpg`) come from profile-grid thumbnails and are the
-lowest quality of the set, so they are sized small on purpose.
+### 1. GitHub Pages
+Repo **Settings → Pages** → Deploy from branch → `main`, `/ (root)`.
+(Pages on a private repo needs a paid GitHub plan; public is free.)
 
-Filenames map to the layout, so swapping a file is enough:
+### 2. unicks.co.uk on Cloudflare
+1. Add the domain to Cloudflare, switch the nameservers at the registrar to the two Cloudflare gives you.
+2. DNS records, **DNS only (grey cloud)** to start:
 
-| File | Used for |
-|---|---|
-| `project-onyx-wetroom.jpg` | Hero background, "Dark" panel, portfolio |
-| `project-stone-ensuite.jpg` | "Light" panel, portfolio |
-| `project-brass-suite.jpg` | About section, portfolio |
-| `detail-brassware.jpg` | Quote band, portfolio |
-| `grid-*.jpg` | Small portfolio tiles |
-| `logo-avatar.jpg` | Header, footer, favicon |
-| `brand-mark.jpg` | Unused. The gold "US" monogram, kept for future use |
+   | Type | Name | Content |
+   |---|---|---|
+   | A | `@` | 185.199.108.153 |
+   | A | `@` | 185.199.109.153 |
+   | A | `@` | 185.199.110.153 |
+   | A | `@` | 185.199.111.153 |
+   | CNAME | `www` | `nifogr.github.io` |
 
-### Adding a project
+3. GitHub **Settings → Pages → Custom domain**: `unicks.co.uk`. Wait for the
+   DNS check, then tick **Enforce HTTPS** once the certificate is issued.
+4. Optional, afterwards: turn the orange cloud on and set Cloudflare
+   **SSL/TLS → Full**. Never use "Flexible": it causes a redirect loop.
 
-Copy any `<figure class="tile …">` block in the `#grid` section and change the
-image, title and `data-cat`. Valid categories: `dark`, `light`, `detail`. They
-drive the filter buttons, so a new category needs a matching button adding.
+### 3. unicksbathroom.co.uk → redirect
+1. Add it to Cloudflare too (nameservers as above).
+2. DNS: `A @ 192.0.2.1` and `CNAME www unicksbathroom.co.uk`, both **proxied (orange)**.
+   The IP is a dummy; Cloudflare answers before it is ever reached.
+3. **Rules → Redirect Rules → Create**: all incoming requests →
+   dynamic → `concat("https://unicks.co.uk", http.request.uri.path)`, status **301**,
+   preserve query string.
 
-Use `tile--lg` for full-resolution photos and `tile--sm` for lower-resolution ones.
+### 4. Google
+Add `unicks.co.uk` in Google Search Console and Google Business Profile.
+The canonical tags already point there.
 
----
+## Photos
 
-## Structure
-
-```
-index.html              # the whole page
-assets/css/style.css    # all styles; design tokens in :root at the top
-assets/js/main.js       # nav, filters, accordion, reveals, form
-assets/img/             # photography
-```
-
-Sections in order: hero → trust strip → about → services → dark/light →
-portfolio → process → quote band → testimonials → FAQ → consultation form → footer.
-
-## Motion
-
-The feel of the site is deliberate, and lives in `assets/js/main.js` (sections 1–7)
-plus the `MOTION LAYER` block at the end of `style.css`.
-
-- **Damped scrolling.** Wheel input is captured and eased toward a target
-  (`window.scrollTo` each frame), so scrolling has weight instead of stepping.
-  Native scrollbar, keyboard, anchors and IntersectionObserver all still work
-  because real scroll position still moves. Desktop pointers only; touch already
-  has its own momentum.
-- **Parallax.** The hero image drifts at 0.2× scroll with a slow entrance scale;
-  the about image and quote band drift against their sections. Both have extra
-  image height so the drift never exposes an edge. If you change a parallax
-  amount, check the matching `height`/`top` in CSS.
-- **Curtain reveals.** `data-rv="mask"` wipes a curtain off the image while the
-  image settles back from a 1.18 over-scale. This deliberately does *not* use
-  `clip-path` on the observed element: Chromium factors an element's own
-  `clip-path` into its IntersectionObserver rect, so a fully clipped box reports
-  zero intersection and never reveals.
-- **Word-rise headings.** `data-split` wraps each word in a clipping span so it
-  rises from behind its own baseline, staggered left to right. Nested markup
-  (`<em>`, `<span>`) is preserved.
-- **Stagger.** Siblings in a group get an increasing `--i`, which feeds
-  `transition-delay`, so rows cascade rather than landing together.
-- **Surface.** A fine animated grain and a vignette sit over everything at very
-  low opacity; they are what stop a flat dark page reading as flat.
-- **Intro.** Brand mark and a loading bar, once per session (`sessionStorage`),
-  handing off to the hero choreography.
-
-Tuning: easing tokens (`--e-expo`, `--e-quart`) and durations (`--d-slow`,
-`--d-mid`) are at the top of the motion layer. Slower and further = heavier.
-
-## Notes
-
-- Responsive down to 320px; breakpoints at 1080 / 900 / 620px.
-- Respects `prefers-reduced-motion`. The entire motion layer disables itself:
-  no intro, no grain, no cursor, no damped scroll, everything visible immediately.
-- Fonts load from Google Fonts, with a system serif/sans fallback stack.
-- Includes `HomeAndConstructionBusiness` structured data for search results,
-  worth extending with the real address and phone once known, since local search
-  drives most enquiries in this trade.
+The newest rooms (`project-star-*.jpg`, `project-cloakroom.jpg`) are full
+resolution. The older ones are Instagram screenshots; swap in originals when
+available, same filenames.
