@@ -104,42 +104,62 @@ Unknowns are shown with a gold dashed underline: search the HTML for `class="ph"
 
 ## Hosting: GitHub Pages + Cloudflare, two domains
 
-Plan: **unicks.co.uk** is the real site. **unicksbathroom.co.uk** permanently
-redirects to it. GitHub Pages only serves one custom domain per repo, and one
-canonical domain is better for Google anyway.
+Both domains are registered at Namecheap. **unicks.co.uk** is the real site.
+**unicksbathrooms.co.uk** permanently redirects to it. GitHub Pages only serves
+one custom domain per repo, and one main address is better for Google anyway.
+The `CNAME` file in this repo already says `unicks.co.uk`.
 
 ### 1. GitHub Pages
-Repo **Settings → Pages** → Deploy from branch → `main`, `/ (root)`.
-(Pages on a private repo needs a paid GitHub plan; public is free.)
+Repo **Settings → Pages** → Source: *Deploy from a branch* → pick the branch
+that holds the finished site (this one, or `main` once it's merged there),
+folder `/ (root)`. Pages on a private repo needs a paid GitHub plan; public is free.
 
-### 2. unicks.co.uk on Cloudflare
-1. Add the domain to Cloudflare, switch the nameservers at the registrar to the two Cloudflare gives you.
-2. DNS records, **DNS only (grey cloud)** to start:
+### 2. Move both domains to Cloudflare (free plan)
+1. In Cloudflare: **Add a site** → `unicks.co.uk` → Free. Cloudflare shows two
+   nameservers (something like `ada.ns.cloudflare.com`, `bob.ns.cloudflare.com`).
+2. In Namecheap: **Domain List → Manage** (unicks.co.uk) → **Nameservers** →
+   *Custom DNS* → paste Cloudflare's two nameservers → save (green tick).
+3. Repeat both steps for `unicksbathrooms.co.uk`.
+4. Wait until Cloudflare marks each domain **Active** (usually under an hour,
+   can take up to a day).
 
-   | Type | Name | Content |
-   |---|---|---|
-   | A | `@` | 185.199.108.153 |
-   | A | `@` | 185.199.109.153 |
-   | A | `@` | 185.199.110.153 |
-   | A | `@` | 185.199.111.153 |
-   | CNAME | `www` | `nifogr.github.io` |
+### 3. unicks.co.uk records in Cloudflare
+DNS, all **DNS only (grey cloud)** to start:
 
-3. GitHub **Settings → Pages → Custom domain**: `unicks.co.uk`. Wait for the
-   DNS check, then tick **Enforce HTTPS** once the certificate is issued.
-4. Optional, afterwards: turn the orange cloud on and set Cloudflare
-   **SSL/TLS → Full**. Never use "Flexible": it causes a redirect loop.
+| Type | Name | Content |
+|---|---|---|
+| A | `@` | 185.199.108.153 |
+| A | `@` | 185.199.109.153 |
+| A | `@` | 185.199.110.153 |
+| A | `@` | 185.199.111.153 |
+| CNAME | `www` | `nifogr.github.io` |
 
-### 3. unicksbathroom.co.uk → redirect
-1. Add it to Cloudflare too (nameservers as above).
-2. DNS: `A @ 192.0.2.1` and `CNAME www unicksbathroom.co.uk`, both **proxied (orange)**.
-   The IP is a dummy; Cloudflare answers before it is ever reached.
-3. **Rules → Redirect Rules → Create**: all incoming requests →
-   dynamic → `concat("https://unicks.co.uk", http.request.uri.path)`, status **301**,
-   preserve query string.
+Delete any other A, AAAA or CNAME records Cloudflare copied over from
+Namecheap's parking page.
 
-### 4. Google
-Add `unicks.co.uk` in Google Search Console and Google Business Profile.
-The canonical tags already point there.
+Then in GitHub **Settings → Pages → Custom domain**: `unicks.co.uk`. Wait for
+the DNS check to pass, then tick **Enforce HTTPS** once the certificate is
+issued (it can take a few minutes after the check passes). Optional,
+afterwards: turn the orange cloud on and set Cloudflare **SSL/TLS → Full**.
+Never use "Flexible": it causes a redirect loop.
+
+### 4. unicksbathrooms.co.uk → unicks.co.uk
+1. DNS: `A @ 192.0.2.1` and `CNAME www unicksbathrooms.co.uk`, both
+   **proxied (orange)**. The IP is a placeholder; Cloudflare answers before it
+   is ever reached.
+2. **Rules → Redirect Rules → Create rule** → *All incoming requests* →
+   URL redirect, *Dynamic*, expression
+   `concat("https://unicks.co.uk", http.request.uri.path)`, status **301**,
+   tick *Preserve query string*.
+
+### 5. Check it
+- `https://unicks.co.uk` and `https://www.unicks.co.uk` open the site with a padlock.
+- `https://unicksbathrooms.co.uk/design.html` lands on `https://unicks.co.uk/design.html`.
+- `https://unicks.co.uk/anything` shows the UNICKS 404 page.
+
+### 6. Google
+Add `unicks.co.uk` in Google Search Console (submit `sitemap.xml`) and in
+Google Business Profile. The canonical tags already point there.
 
 ## Photos
 
