@@ -78,6 +78,10 @@ change the new thing, not the rules.
 - Light in 3D is warm white (about 2700K). Evening light dims the ceiling and
   lets the LED strips carry the room.
 - Stone textures are CC0 scans from ambientCG (see `assets/tex/`).
+- Things in 3D arrive the way they would on site: the floor is laid, walls
+  rise, fittings grow out of a gold outline, stone pours in behind a lit edge.
+  Nothing pops or flashes. Surfaces that touch are always set a few
+  millimetres apart so nothing flickers.
 
 ## 8. Words
 

@@ -36,6 +36,15 @@ window.UNICKS_STUDIO = {
     { id: 'travertine', name: 'Travertine', wall: 400, floor: 200 }
   ],
 
+  // the walls inside the shower can use a different stone
+  feature: { same: 'Same as the walls', price: 600 },   // price applies when a different stone is picked
+
+  floorPatterns: [
+    { id: 'large', name: 'Large tiles', note: '120 x 60 cm, lined up', price: 0 },
+    { id: 'brick', name: 'Staggered', note: '120 x 60 cm, offset rows', price: 150 },
+    { id: 'square', name: 'Square slabs', note: '90 x 90 cm', price: 300 }
+  ],
+
   metals: [
     { id: 'brass', name: 'Brushed brass', price: 0 },
     { id: 'black', name: 'Matt black', price: 0 },
@@ -49,6 +58,34 @@ window.UNICKS_STUDIO = {
     { id: 'stone', name: 'Stone to match', price: 950 }
   ],
 
+  vanityFronts: [
+    { id: 'flat', name: 'Flat drawers', price: 0 },
+    { id: 'fluted', name: 'Fluted front', price: 650 }
+  ],
+
+  basins: [
+    { id: 'trough', name: 'Stone trough', note: 'Carved into the top', price: 0 },
+    { id: 'vessel', name: 'Round bowl', note: 'Ceramic bowl on a stone top', price: 0 },
+    { id: 'double', name: 'Double trough', note: 'Two basins side by side', price: 1100, minW: 2.4 }
+  ],
+
+  mirrors: [
+    { id: 'rect', name: 'Rectangle', price: 0 },
+    { id: 'arch', name: 'Arch', price: 200 },
+    { id: 'round', name: 'Round', price: 100 }
+  ],
+
+  screens: [
+    { id: 'framed', name: 'Slim frame', note: 'Glass with a fine metal frame', price: 0 },
+    { id: 'frameless', name: 'Frameless', note: 'Clear glass, one support bar', price: 250 },
+    { id: 'fluted', name: 'Fluted glass', note: 'Ribbed glass for privacy', price: 550 }
+  ],
+
+  ledTemps: [
+    { id: 'warm', name: 'Warm white', note: 'Soft and golden, 2700K', price: 0 },
+    { id: 'neutral', name: 'Neutral white', note: 'Brighter and cleaner, 4000K', price: 0 }
+  ],
+
   lights: [
     { id: 'plinth', name: 'Under-glow', note: 'LED strip under the vanity and the shower bench', price: 380 },
     { id: 'mirror', name: 'Backlit mirror', note: 'Soft light around the mirror', price: 420 },
@@ -60,19 +97,22 @@ window.UNICKS_STUDIO = {
   extras: [
     { id: 'star', name: 'Star inlay', note: 'A compass star set into the floor', price: 1450 },
     { id: 'border', name: 'Floor border', note: 'A contrasting line around the floor', price: 850 },
-    { id: 'bench', name: 'Shower bench', note: 'Built-in stone bench', price: 1250 },
-    { id: 'rain', name: 'Rain shower', note: 'Large shower head overhead', price: 450 },
+    { id: 'bench', name: 'Shower bench', note: 'Built-in stone bench', price: 1250, tab: 'shower' },
+    { id: 'rain', name: 'Rain shower', note: 'Large shower head overhead', price: 450, tab: 'shower' },
     { id: 'rail', name: 'Heated towel rail', note: 'Ladder rail in your metal finish', price: 390 },
     { id: 'ufh', name: 'Underfloor heating', note: 'Not shown in the 3D view', price: 950 }
   ],
 
   // ready-made starting points, shown at the top of the designer (the first is the default)
   looks: [
-    { id: 'cream', name: 'Cream and walnut', wall: 'cream', floor: 'travertine', metal: 'brass', vanity: 'walnut',
+    { id: 'cream', name: 'Cream and walnut', wall: 'cream', feature: 'same', floor: 'travertine', pattern: 'large',
+      metal: 'brass', vanity: 'walnut', front: 'flat', basin: 'trough', mirror: 'rect', screen: 'framed', led: 'warm',
       lights: ['plinth', 'mirror', 'niche'], extras: ['star', 'rain', 'rail'] },
-    { id: 'gold', name: 'Black and gold', wall: 'black', floor: 'black', metal: 'brass', vanity: 'oak',
+    { id: 'gold', name: 'Black and gold', wall: 'black', feature: 'same', floor: 'black', pattern: 'square',
+      metal: 'brass', vanity: 'oak', front: 'fluted', basin: 'trough', mirror: 'arch', screen: 'framed', led: 'warm',
       lights: ['plinth', 'mirror', 'niche', 'cove'], extras: ['star', 'bench', 'rain'] },
-    { id: 'stone', name: 'Warm stone', wall: 'brown', floor: 'cream', metal: 'brass', vanity: 'walnut',
+    { id: 'stone', name: 'Warm stone', wall: 'cream', feature: 'brown', floor: 'cream', pattern: 'brick',
+      metal: 'brass', vanity: 'walnut', front: 'flat', basin: 'vessel', mirror: 'round', screen: 'fluted', led: 'warm',
       lights: ['plinth', 'niche', 'sconce'], extras: ['border', 'bench', 'rail'] }
   ]
 };

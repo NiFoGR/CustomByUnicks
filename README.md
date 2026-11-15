@@ -46,29 +46,50 @@ so it can be shared, and the full list plus that link are sent with the enquiry.
 
 ## The 3D designer (design.html)
 
-The customer builds their room: size, layout, stone for walls and floor, metal
-finish, vanity, lighting and extras. The room is drawn live in the browser with
-three.js, so every change shows instantly, including an evening light mode for
-the LED options. They can orbit and zoom, jump to the vanity, shower, bath or a
-plan view, copy a link, save a picture, and send the design with the form.
+The customer builds their room and sees it drawn live in the browser with
+three.js. What they can set:
+
+- **Room:** width and length, walk-in shower or shower and bath.
+- **Stone:** walls, a different stone inside the shower if they want one,
+  floor, and how the floor is laid (large, staggered or square).
+- **Vanity:** metal finish, wood or stone, flat or fluted front, basin
+  (trough, round bowl or double trough) and mirror shape.
+- **Shower:** slim-framed, frameless or fluted glass, bench, rain shower.
+- **Lighting:** five LED options and warm or neutral white.
+- **Extras:** star inlay, floor border, towel rail, underfloor heating.
+
+How it behaves:
+
+- The room assembles itself on arrival: floor, walls, then fittings and light.
+- Changing something rebuilds only that part. Fittings grow out of a gold
+  outline, new stone pours across the surface behind a lit edge, LED lines
+  draw on, metal shifts colour.
+- Drag to orbit, scroll or pinch to zoom, or jump to the vanity, shower, bath
+  or a plan view. Evening light dims the room so the LEDs show.
+- Click anything in the room to open its options. Hovering names it.
+- Copy a link, save a picture, or send the design with the form.
+- On a slow machine it turns off the soft-shadow pass, then lowers the
+  resolution, so it stays smooth.
+
+For whoever maintains it:
 
 - **Prices and wording:** `assets/js/studio-data.js` (the comment at the top
   explains the formula). All prices are placeholders.
 - **What you receive:** the enquiry includes the full list (room size, layout,
-  every finish and option, guide price) and a link that reopens the exact room,
-  for example `design.html?w=2.4&l=2.6&lay=shower&wall=cream&floor=travertine&metal=brass&van=walnut&li=plinth,mirror,niche&ex=star,rain,rail`.
+  every finish and option, guide price) and a link that reopens the exact room.
+  Links made before an option existed still open, with the plain version of it.
 - **No 3D?** On a device without WebGL the page shows a still image and every
   option, price and the form still work.
 - **Real models later:** each fitting is a function in `studio-scene.js`
-  (vanity, toilet, bath, shower, towel rail...). A model made in Blender can
+  (`vanityPart`, `toiletPart`, `bathPart`...). A model made in Blender can
   replace one: export it as `.glb` and load it with three.js's GLTFLoader in
   that function.
 - **Stone textures:** `assets/tex/<stone>-2k.webp` (desktop), `-1k.webp`
   (phones) and `-sw.webp` (the swatch). To add a stone, add the three files and
   a line in `studio-data.js`.
-- **Still images:** `assets/img/studio-poster*.webp` (shown while the 3D loads)
-  and `assets/img/studio-door*` (homepage) are renders of the default room.
-  Re-shoot them if the default look changes.
+- **Still images:** `assets/img/studio-poster*.webp` (shown dimmed while the 3D
+  loads) and `assets/img/studio-door*` (homepage) are renders of the default
+  room. Re-shoot them if the default look changes.
 
 ## Connect the forms
 
