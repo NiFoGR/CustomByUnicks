@@ -29,18 +29,25 @@ var CONTACT_EMAIL = '';
   $$('[data-year]').forEach(function (el) { el.textContent = new Date().getFullYear(); });
 
   /* ---------- Opening: logo, gold line, curtain up (first page of a visit only) ---------- */
+  // Text and header are revealed by the small script in <head> as soon as the fonts arrive
+  // (html.is-loaded). The main photo only wipes in once it has actually downloaded (html.is-photo).
   var root = document.documentElement, intro = $('.intro');
-  var loaded = function () { document.body.classList.add('is-loaded'); };
+  var photo = $('.hero__media img.is-on, .pagehead__bg img');
+  var photoReady = !photo ? Promise.resolve() : photo.complete ? (photo.decode ? photo.decode().catch(function () {}) : Promise.resolve())
+    : new Promise(function (r) { photo.addEventListener('load', r, { once: true }); photo.addEventListener('error', r, { once: true }); });
   if (intro && !root.classList.contains('no-intro')) {
     try { sessionStorage.setItem('unicks-intro', '1'); } catch (e) {}
-    setTimeout(function () { intro.classList.add('is-out'); }, 1500);
-    setTimeout(loaded, 1650);
-    setTimeout(function () { intro.remove(); }, 2900);
+    document.body.style.overflow = 'hidden';
+    // keep the opening up for at least 1.5s, and until the photo is in (but never past 2.6s)
+    Promise.all([new Promise(function (r) { setTimeout(r, 1500); }), Promise.race([photoReady, new Promise(function (r) { setTimeout(r, 2600); })])]).then(function () {
+      intro.classList.add('is-out');
+      setTimeout(function () { document.body.style.overflow = ''; root.classList.add('is-loaded'); }, 150);
+      setTimeout(function () { intro.remove(); }, 1400);
+      photoReady.then(function () { setTimeout(function () { root.classList.add('is-photo'); }, 150); });
+    });
   } else {
-    var go = function () { requestAnimationFrame(loaded); };
-    if (document.fonts && document.fonts.ready) {
-      Promise.race([document.fonts.ready, new Promise(function (r) { setTimeout(r, 500); })]).then(go);
-    } else { go(); }
+    root.classList.add('is-loaded');
+    photoReady.then(function () { requestAnimationFrame(function () { root.classList.add('is-photo'); }); });
   }
 
   /* ---------- Header: clear over the hero, solid once you scroll ---------- */
@@ -307,7 +314,7 @@ var CONTACT_EMAIL = '';
   /* ---------- Reveal on scroll, staggered within each group ---------- */
   // section headings rise out of a mask: wrap their text once
   $$('h2.rv').forEach(function (h) { h.innerHTML = '<span class="mask"><span>' + h.innerHTML + '</span></span>'; });
-  var rv = $$('.rv, [data-reveal]'), groups = new Map();
+  var rv = $$('.rv, [data-reveal]').filter(function (el) { return !el.closest('#rail'); }), groups = new Map();
   rv.forEach(function (el) {
     var n = groups.get(el.parentElement) || 0;
     el.style.setProperty('--i', Math.min(n, 5));
@@ -323,6 +330,15 @@ var CONTACT_EMAIL = '';
   } else {
     rv.forEach(function (el) { el.classList.add('is-in'); });
   }
+  if (rail) {
+    var cards = $$('.work', rail);
+    cards.forEach(function (c, i) { c.style.setProperty('--i', Math.min(i, 2)); });
+    var showRail = function () { cards.forEach(function (c) { c.classList.add('is-in'); }); };
+    if ('IntersectionObserver' in window && !REDUCED) {
+      var rio = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { showRail(); rio.disconnect(); } }, { rootMargin: '0px 0px -10% 0px' });
+      rio.observe(rail);
+    } else { showRail(); }
+  }
 
   /* ---------- Depth: things move at different speeds as you scroll ---------- */
   if (!REDUCED) {
@@ -332,11 +348,17 @@ var CONTACT_EMAIL = '';
     var star = $('[data-spin]');
     var vh = window.innerHeight, queued = false;
     var offset = function (el) { var r = el.getBoundingClientRect(); return r.bottom < -200 || r.top > vh + 200 ? null : r.top + r.height / 2 - vh / 2; };
+    // photos are drawn at 110% of their frame, so each has 5% spare on every side; stay inside 90% of it
+    var clamp = function (v, el) { var m = el.offsetHeight * 0.045; return Math.max(-m, Math.min(m, v)); };
+    var wide = window.matchMedia('(min-width: 941px)');
     var frame = function () {
       queued = false;
-      if (hero) { var hy = window.scrollY; if (hy < vh * 1.2) hero.style.setProperty('--dy', (hy * 0.12).toFixed(1) + 'px'); }
-      layers.forEach(function (el) { var o = offset(el); if (o !== null) el.style.setProperty('--py', (o * parseFloat(el.dataset.parallax)).toFixed(1) + 'px'); });
-      inner.forEach(function (el) { var o = offset(el); if (o !== null) el.style.setProperty('--dy', (o * -0.06).toFixed(1) + 'px'); });
+      if (hero) { var hy = window.scrollY; if (hy < vh * 1.2) hero.style.setProperty('--dy', clamp(hy * 0.12, hero).toFixed(1) + 'px'); }
+      layers.forEach(function (el) {
+        var o = wide.matches ? offset(el) : 0;
+        if (o !== null) el.style.setProperty('--py', (o * parseFloat(el.dataset.parallax)).toFixed(1) + 'px');
+      });
+      inner.forEach(function (el) { var o = offset(el); if (o !== null) el.style.setProperty('--dy', clamp(o * -0.06, el).toFixed(1) + 'px'); });
       if (star) { var o = offset(star.parentElement); if (o !== null) star.style.setProperty('--rot', (o * -0.04).toFixed(2) + 'deg'); }
     };
     var queue = function () { if (!queued) { queued = true; requestAnimationFrame(frame); } };
