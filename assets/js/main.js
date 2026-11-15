@@ -17,39 +17,40 @@ var CONTACT_EMAIL = '';
   var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
   var REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var DATA = window.UNICKS_DATA;
-  var ARROW = '<svg viewBox="0 0 14 10" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M1 5h11M8.5 1.5L12 5 8.5 8.5"/></svg>';
-  var TICK = '<svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 6.5l2.5 2.5L10 3.5"/></svg>';
+  var ARROW = '<svg viewBox="0 0 15 10" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M1 5h12M9.5 1.5L13 5 9.5 8.5"/></svg>';
+  var TICK = '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.5l2.5 2.5L10 3.5"/></svg>';
 
-  var money = function (n) { return DATA.currency + n.toLocaleString('en-GB'); };
+  var money = function (n) { return DATA.currency + Math.round(n).toLocaleString('en-GB'); };
   var esc = function (s) {
     return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; });
   };
 
   $$('[data-year]').forEach(function (el) { el.textContent = new Date().getFullYear(); });
 
+  /* ---------- Header: clear over the hero, solid once you scroll ---------- */
+  var hdr = $('[data-hdr]'), ticking = false;
+  var onScroll = function () { hdr.classList.toggle('is-solid', window.scrollY > 24); ticking = false; };
+  window.addEventListener('scroll', function () {
+    if (!ticking) { ticking = true; requestAnimationFrame(onScroll); }
+  }, { passive: true });
+  onScroll();
+
   /* ---------- Mobile menu ---------- */
   var burger = $('.burger'), drawer = $('#drawer');
   if (burger && drawer) {
     var setMenu = function (open) {
       burger.setAttribute('aria-expanded', open);
+      burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
       drawer.classList.toggle('is-open', open);
+      document.body.classList.toggle('menu-open', open);
       document.body.style.overflow = open ? 'hidden' : '';
     };
     burger.addEventListener('click', function () { setMenu(burger.getAttribute('aria-expanded') !== 'true'); });
     $$('a', drawer).forEach(function (a) { a.addEventListener('click', function () { setMenu(false); }); });
-  }
-
-  /* ---------- Reveal on scroll ---------- */
-  var rv = $$('.rv');
-  if ('IntersectionObserver' in window && !REDUCED) {
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) {
-        if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
-      });
-    }, { rootMargin: '0px 0px -8% 0px' });
-    rv.forEach(function (el) { io.observe(el); });
-  } else {
-    rv.forEach(function (el) { el.classList.add('is-in'); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && burger.getAttribute('aria-expanded') === 'true') { setMenu(false); burger.focus(); }
+    });
+    window.addEventListener('resize', function () { if (window.innerWidth > 940) setMenu(false); });
   }
 
   /* ---------- Hero slides ---------- */
@@ -61,46 +62,57 @@ var CONTACT_EMAIL = '';
       cur = (i + imgs.length) % imgs.length;
       imgs[cur].classList.add('is-on'); dots[cur].setAttribute('aria-current', 'true');
     };
-    var play = function () { if (!REDUCED) { clearInterval(timer); timer = setInterval(function () { show(cur + 1); }, 6000); } };
+    var play = function () {
+      clearInterval(timer);
+      if (!REDUCED) timer = setInterval(function () { show(cur + 1); }, 6500);
+    };
     dots.forEach(function (d, i) { d.addEventListener('click', function () { show(i); play(); }); });
+    document.addEventListener('visibilitychange', function () { if (document.hidden) clearInterval(timer); else play(); });
     play();
   }
 
   /* ---------- Project rail ---------- */
   var rail = $('#rail');
   if (rail) {
-    $$('[data-rail]').forEach(function (b) {
+    var prev = $('[data-rail="-1"]'), next = $('[data-rail="1"]');
+    var edges = function () {
+      prev.disabled = rail.scrollLeft < 8;
+      next.disabled = rail.scrollLeft + rail.clientWidth > rail.scrollWidth - 8;
+    };
+    [prev, next].forEach(function (b) {
       b.addEventListener('click', function () {
-        var step = rail.firstElementChild.getBoundingClientRect().width + 20;
+        var step = rail.firstElementChild.getBoundingClientRect().width + 24;
         rail.scrollBy({ left: step * Number(b.dataset.rail), behavior: REDUCED ? 'auto' : 'smooth' });
       });
     });
+    rail.addEventListener('scroll', edges, { passive: true });
+    window.addEventListener('resize', edges);
+    edges();
   }
 
   /* ---------- Package cards ---------- */
-  var tierHTML = function (p, i, inner) {
+  var tierHTML = function (p, i, action) {
     return '<span class="tier__tag">Package ' + String.fromCharCode(65 + i) + '</span>' +
       (p.featured ? '<span class="tier__flag">Recommended</span>' : '') +
       '<h3>' + esc(p.name) + '</h3>' +
       '<p class="tier__sum">' + esc(p.summary) + '</p>' +
       '<div class="tier__price"><small>From</small>' + money(p.from) + '</div>' +
-      '<ul>' + p.includes.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' + inner;
+      '<ul>' + p.includes.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' + action;
   };
 
   var teaser = $('#teaser');
   if (teaser && DATA) {
     teaser.innerHTML = DATA.packages.map(function (p, i) {
       return '<article class="tier rv' + (p.featured ? ' is-featured' : '') + '">' +
-        tierHTML(p, i, '<a class="btn' + (p.featured ? ' btn--solid' : '') + '" href="packages.html?p=' + p.id + '#customise">Customise ' + ARROW + '</a>') +
+        tierHTML(p, i, '<a class="btn' + (p.featured ? ' btn--solid' : '') + '" href="packages.html?p=' + p.id + '#customise">Price ' + esc(p.name) + ' ' + ARROW + '</a>') +
         '</article>';
     }).join('');
-    $$('.rv', teaser).forEach(function (el) { el.classList.add('is-in'); });
   }
 
   /* ======================================================================
      CONFIGURATOR
-     State lives in the URL (?p=b&f=dark&o=bench,rain) so a build can be
-     shared, bookmarked and sent with the enquiry.
+     State lives in the URL (?p=b&finish=dark&o=bench,rain) so a choice can
+     be shared, bookmarked and sent with the enquiry.
      ====================================================================== */
   var tiersEl = $('#tiers');
   var buildText = '';
@@ -108,41 +120,35 @@ var CONTACT_EMAIL = '';
     var state = { pkg: null, single: {}, multi: {} };
     var pkgById = function (id) { return DATA.packages.filter(function (p) { return p.id === id; })[0] || null; };
     var priceOf = function (opt) {
-      if (!state.pkg) return typeof opt.price === 'number' ? opt.price : null;
       if (typeof opt.price === 'number') return opt.price;
+      if (!state.pkg) return null;
       var v = opt.price[state.pkg.id];
       return v === undefined ? null : v;
     };
 
-    // defaults for single-choice groups
     DATA.groups.forEach(function (g) { if (g.type === 'single') state.single[g.id] = g.options[0].id; });
 
-    // restore from URL
     var q = new URLSearchParams(location.search);
     state.pkg = pkgById(q.get('p'));
     DATA.groups.forEach(function (g) {
-      if (g.type === 'single') {
-        var want = q.get(g.id);
-        if (g.options.some(function (o) { return o.id === want; })) state.single[g.id] = want;
-      }
+      var want = q.get(g.id);
+      if (g.type === 'single' && g.options.some(function (o) { return o.id === want; })) state.single[g.id] = want;
     });
     (q.get('o') || '').split(',').forEach(function (id) { if (id) state.multi[id] = true; });
 
-    // build package buttons
     tiersEl.innerHTML = DATA.packages.map(function (p, i) {
-      return '<button type="button" class="tier' + (p.featured ? ' is-featured' : '') + '" data-pkg="' + p.id + '" aria-pressed="false">' +
-        tierHTML(p, i, '<span class="tier__pick">Choose ' + esc(p.name) + '</span>') + '</button>';
+      return '<article class="tier rv' + (p.featured ? ' is-featured' : '') + '" data-pkg="' + p.id + '">' +
+        tierHTML(p, i, '<button type="button" class="btn" aria-pressed="false">Choose ' + esc(p.name) + '</button>') + '</article>';
     }).join('');
 
-    // build option groups
     $('#groups').innerHTML = DATA.groups.map(function (g) {
-      return '<fieldset class="ogroup"><legend><h3>' + esc(g.title) + '</h3></legend><div class="opts">' +
+      return '<fieldset class="ogroup"><legend>' + esc(g.title) + '</legend><div class="opts">' +
         g.options.map(function (o) {
           var type = g.type === 'single' ? 'radio' : 'checkbox';
           return '<label class="opt" data-type="' + g.type + '" data-opt="' + o.id + '">' +
             '<input type="' + type + '" name="' + (g.type === 'single' ? g.id : o.id) + '" value="' + o.id + '">' +
             '<span class="opt__box">' + TICK + '</span>' +
-            '<span class="opt__txt"><span class="opt__name">' + esc(o.name) + '</span><span class="opt__note">' + esc(o.note) + '</span></span>' +
+            '<span><span class="opt__name">' + esc(o.name) + '</span><span class="opt__note">' + esc(o.note) + '</span></span>' +
             '<span class="opt__price"></span></label>';
         }).join('') + '</div></fieldset>';
     }).join('');
@@ -151,6 +157,21 @@ var CONTACT_EMAIL = '';
     $$('.opt').forEach(function (el) { optEls[el.dataset.opt] = el; });
     $$('[data-sum-note]').forEach(function (el) { el.textContent = DATA.note; });
 
+    // the total counts up or down to its new value instead of jumping
+    var shown = 0, tween;
+    var showTotal = function (to) {
+      var els = $$('[data-sum-total]');
+      if (REDUCED || !shown) { shown = to; els.forEach(function (el) { el.textContent = money(to); }); return; }
+      var from = shown, t0 = performance.now();
+      cancelAnimationFrame(tween);
+      (function step(t) {
+        var k = Math.min(1, (t - t0) / 500), e = 1 - Math.pow(1 - k, 4);
+        shown = from + (to - from) * e;
+        els.forEach(function (el) { el.textContent = money(shown); });
+        if (k < 1) tween = requestAnimationFrame(step);
+      })(t0);
+    };
+
     var syncURL = function () {
       if (!state.pkg) return;
       var p = new URLSearchParams();
@@ -158,21 +179,27 @@ var CONTACT_EMAIL = '';
       DATA.groups.forEach(function (g) {
         if (g.type === 'single' && state.single[g.id] !== g.options[0].id) p.set(g.id, state.single[g.id]);
       });
-      var picked = Object.keys(state.multi).filter(function (k) { return state.multi[k]; });
+      var picked = Object.keys(state.multi).filter(function (k) {
+        return state.multi[k] && optEls[k] && !optEls[k].hidden && !optEls[k].classList.contains('is-incl');
+      });
       if (picked.length) p.set('o', picked.join(','));
       history.replaceState(null, '', location.pathname + '?' + p.toString().replace(/%2C/g, ',') + location.hash);
     };
 
+    var bar = $('.pbar'), updateBar = function () {};
     var render = function () {
       var has = !!state.pkg;
       $('#cfg').classList.toggle('is-locked', !has);
       $('#cfg-hint').textContent = has
-        ? 'Included items are already ticked. Add anything else you want.'
-        : 'Choose a package above to see the options.';
-      $$('[data-pkg]').forEach(function (b) { b.setAttribute('aria-pressed', has && b.dataset.pkg === state.pkg.id); });
+        ? 'Anything already in your package is ticked. Add whatever else you want.'
+        : 'Choose a package above to see the extras.';
+      $$('[data-pkg]').forEach(function (card) {
+        var on = has && card.dataset.pkg === state.pkg.id;
+        card.classList.toggle('is-picked', on);
+        $('button', card).setAttribute('aria-pressed', on);
+      });
 
-      var total = has ? state.pkg.from : 0;
-      var lines = [], text = [];
+      var total = has ? state.pkg.from : 0, lines = [], text = [];
       if (has) {
         lines.push([state.pkg.name + ' package', money(state.pkg.from)]);
         text.push('Package: ' + state.pkg.name + ' (from ' + money(state.pkg.from) + ')');
@@ -183,14 +210,12 @@ var CONTACT_EMAIL = '';
           var el = optEls[o.id], input = $('input', el), p = priceOf(o);
           el.hidden = p === null;
           if (p === null) { input.checked = false; return; }
-          var incl = p === 0;
-          var on;
+          var incl = p === 0, on, price = $('.opt__price', el);
+          price.textContent = incl ? 'Included' : '+' + money(p);
+          price.classList.toggle('is-zero', incl);
           if (g.type === 'single') {
             on = state.single[g.id] === o.id;
             input.checked = on;
-            el.classList.remove('is-incl');
-            $('.opt__price', el).textContent = incl ? 'Included' : '+' + money(p);
-            $('.opt__price', el).classList.toggle('is-zero', incl);
             if (on) {
               lines.push([g.title + ': ' + o.name, incl ? 'Included' : '+' + money(p)]);
               text.push(g.title + ': ' + o.name + (incl ? '' : ' (+' + money(p) + ')'));
@@ -200,8 +225,6 @@ var CONTACT_EMAIL = '';
             input.checked = on;
             input.disabled = incl;
             el.classList.toggle('is-incl', incl);
-            $('.opt__price', el).textContent = incl ? 'Included' : '+' + money(p);
-            $('.opt__price', el).classList.toggle('is-zero', incl);
             if (on && !incl) {
               lines.push([o.name, '+' + money(p)]);
               text.push('+ ' + o.name + ' (' + money(p) + ')');
@@ -212,69 +235,85 @@ var CONTACT_EMAIL = '';
       });
 
       $$('[data-sum-name]').forEach(function (el) { el.textContent = has ? state.pkg.name : 'No package yet'; });
-      $$('[data-sum-total]').forEach(function (el) { el.textContent = money(total); });
-      var ul = $('[data-sum-lines]');
-      ul.innerHTML = lines.length
+      showTotal(total);
+      $('[data-sum-lines]').innerHTML = lines.length
         ? lines.map(function (l) { return '<li><span>' + esc(l[0]) + '</span><span>' + esc(l[1]) + '</span></li>'; }).join('')
         : '<li class="is-empty">Choose a package to start.</li>';
 
-      $$('.steps a').forEach(function (a) {
+      $$('.stepper a').forEach(function (a) {
         var n = Number(a.dataset.step);
         a.classList.toggle('is-done', (n === 1 && has) || (n === 2 && has && lines.length > 2));
       });
-      $('.pbar').classList.toggle('has-pkg', has);
+      bar.classList.toggle('has-pkg', has);
       updateBar();
 
-      buildText = has ? text.concat(['Guide price: ' + money(total)]).join('\n') : 'No package selected';
+      buildText = has ? text.concat(['Guide price: ' + money(total)]).join('\n') : '';
       syncURL();
     };
 
     tiersEl.addEventListener('click', function (e) {
-      var b = e.target.closest('[data-pkg]');
-      if (!b) return;
+      var card = e.target.closest('[data-pkg]');
+      if (!card) return;
       var first = !state.pkg;
-      state.pkg = pkgById(b.dataset.pkg);
+      state.pkg = pkgById(card.dataset.pkg);
       render();
-      if (first || window.innerWidth < 1080) {
+      if (first || window.innerWidth < 1120) {
         $('#customise').scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth' });
       }
     });
 
     $('#groups').addEventListener('change', function (e) {
-      var input = e.target, el = input.closest('.opt');
-      if (!el) return;
+      var input = e.target;
       if (input.type === 'radio') state.single[input.name] = input.value;
       else state.multi[input.value] = input.checked;
       render();
     });
 
-    // share
     var share = $('[data-share]');
     share.addEventListener('click', function () {
       var url = location.href.split('#')[0];
-      var done = function () { share.textContent = 'Link copied'; setTimeout(function () { share.textContent = 'Copy link to this build'; }, 2000); };
+      var done = function () { share.textContent = 'Link copied'; setTimeout(function () { share.textContent = 'Copy a link to this'; }, 2200); };
       if (navigator.clipboard) navigator.clipboard.writeText(url).then(done, function () { window.prompt('Copy this link', url); });
       else window.prompt('Copy this link', url);
     });
 
-    // mobile price bar: visible once a package is chosen, hidden over the form
-    var bar = $('.pbar'), sendVisible = false, topVisible = true;
-    var updateBar = function () { bar.classList.toggle('is-on', bar.classList.contains('has-pkg') && !sendVisible && !topVisible); };
+    // mobile price bar: shows once a package is chosen, hides over the top of the page and the form
+    var sendVisible = false, topVisible = true;
+    updateBar = function () { bar.classList.toggle('is-on', bar.classList.contains('has-pkg') && !sendVisible && !topVisible); };
     if ('IntersectionObserver' in window) {
       new IntersectionObserver(function (es) { sendVisible = es[0].isIntersecting; updateBar(); }).observe($('#send'));
-      new IntersectionObserver(function (es) { topVisible = es[0].isIntersecting; updateBar(); }).observe($('.cfg-hero'));
+      new IntersectionObserver(function (es) { topVisible = es[0].isIntersecting; updateBar(); }).observe($('.pagehead'));
     }
 
     render();
+  }
+
+  /* ---------- Reveal on scroll, staggered within each group ---------- */
+  var rv = $$('.rv'), groups = new Map();
+  rv.forEach(function (el) {
+    var n = groups.get(el.parentElement) || 0;
+    el.style.setProperty('--i', Math.min(n, 4));
+    groups.set(el.parentElement, n + 1);
+  });
+  if ('IntersectionObserver' in window && !REDUCED) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
+      });
+    }, { rootMargin: '0px 0px -8% 0px' });
+    rv.forEach(function (el) { io.observe(el); });
+  } else {
+    rv.forEach(function (el) { el.classList.add('is-in'); });
   }
 
   /* ---------- Forms ---------- */
   $$('[data-form]').forEach(function (form) {
     var msg = $('.form__msg', form), btn = $('[type="submit"]', form);
 
-    var setMsg = function (text) {
+    var setMsg = function (text, ok) {
       msg.textContent = text;
-      msg.classList.add('is-on');
+      msg.className = 'form__msg is-on' + (ok ? ' is-ok' : '');
+      msg.focus({ preventScroll: true });
       msg.scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'center' });
     };
 
@@ -283,36 +322,44 @@ var CONTACT_EMAIL = '';
       $$('[required]', form).forEach(function (el) {
         var v = el.value.trim(), good = v !== '';
         if (good && el.type === 'email') good = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
-        if (good && el.type === 'tel') good = v.replace(/\D/g, '').length >= 7;
+        if (good && el.type === 'tel') good = v.replace(/\D/g, '').length >= 10;
         el.closest('.field').classList.toggle('is-bad', !good);
+        el.setAttribute('aria-invalid', !good);
         if (!good && !firstBad) firstBad = el;
       });
       if (firstBad) firstBad.focus();
       return !firstBad;
     };
     $$('[required]', form).forEach(function (el) {
-      el.addEventListener('input', function () { el.closest('.field').classList.remove('is-bad'); });
+      el.addEventListener('input', function () {
+        el.closest('.field').classList.remove('is-bad');
+        el.removeAttribute('aria-invalid');
+      });
     });
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
+      if (!validate()) return;
       if (form.hasAttribute('data-build')) {
         form.elements.build.value = buildText;
-        form.elements.build_link.value = location.href.split('#')[0];
+        form.elements.build_link.value = buildText ? location.href.split('#')[0] : '';
       }
-      if (!validate()) return;
 
       var fd = new FormData(form);
-      if (fd.get('company')) { form.reset(); setMsg('Thank you. We will be in touch shortly.'); return; }
+      if (fd.get('company')) { form.reset(); setMsg('Thanks. We\'ll be in touch soon.', true); return; }
 
       if (!FORM_ENDPOINT) {
-        if (!CONTACT_EMAIL) { console.warn('Form not connected: set FORM_ENDPOINT or CONTACT_EMAIL in assets/js/main.js'); setMsg('Online enquiries are not switched on yet. Please message us on Instagram @custombyunicks.'); return; }
+        if (!CONTACT_EMAIL) {
+          console.warn('Form not connected: set FORM_ENDPOINT or CONTACT_EMAIL in assets/js/main.js');
+          setMsg('Online booking isn\'t switched on yet. Please message us on Instagram @custombyunicks.');
+          return;
+        }
         var body = ['Name: ' + fd.get('name'), 'Phone: ' + fd.get('phone'), 'Email: ' + fd.get('email'),
-          'Postcode: ' + fd.get('postcode'), '', fd.get('message') || ''];
-        if (fd.get('build')) body.push('', '--- Build ---', fd.get('build'), fd.get('build_link'));
-        location.href = 'mailto:' + CONTACT_EMAIL + '?subject=' + encodeURIComponent('Enquiry from ' + fd.get('name')) +
+          'Postcode: ' + fd.get('postcode'), 'Found us via: ' + (fd.get('source') || 'not given'), '', fd.get('message') || ''];
+        if (fd.get('build')) body.push('', 'Package and extras:', fd.get('build'), fd.get('build_link'));
+        location.href = 'mailto:' + CONTACT_EMAIL + '?subject=' + encodeURIComponent('Survey request from ' + fd.get('name')) +
           '&body=' + encodeURIComponent(body.join('\n'));
-        setMsg('Opening your email app to send this.');
+        setMsg('Opening your email app to send this.', true);
         return;
       }
 
@@ -321,10 +368,11 @@ var CONTACT_EMAIL = '';
       fetch(FORM_ENDPOINT, { method: 'POST', body: fd, headers: { Accept: 'application/json' } })
         .then(function (r) {
           if (!r.ok) throw new Error(r.status);
+          var first = String(fd.get('name') || '').trim().split(' ')[0];
           form.reset();
-          setMsg('Thank you. Your enquiry has been sent. We will be in touch shortly.');
+          setMsg('Thanks' + (first ? ', ' + first : '') + '. We\'ve got your request and we\'ll be in touch to book your survey.', true);
         })
-        .catch(function () { setMsg('Something went wrong. Please try again, or message us on Instagram @custombyunicks.'); })
+        .catch(function () { setMsg('That didn\'t send. Please try again, or message us on Instagram @custombyunicks.'); })
         .then(function () { btn.disabled = false; btn.textContent = label; });
     });
   });

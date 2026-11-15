@@ -2,7 +2,8 @@
    UNICKS: package + option data
    --------------------------------------------------------------------------
    This file is the only thing to edit when packages or prices change.
-   The configurator on packages.html is built entirely from it.
+   The cards on the homepage and the price builder on packages.html are
+   both built from it.
 
    PACKAGES
      id       short code used in share links (keep it short, never reuse)
@@ -26,17 +27,17 @@
    ========================================================================== */
 window.UNICKS_DATA = {
   currency: '£',
-  note: 'Guide prices for a standard bathroom up to around 5m². Your fixed, itemised quote follows a free survey.',
+  note: 'Guide price for a typical 5m² bathroom. You get a fixed quote in writing after the free survey.',
 
   packages: [
     {
       id: 'a',
       name: 'Essential',
       from: 7950,
-      summary: 'Everything you need for a full new bathroom.',
+      summary: 'Everything a new bathroom needs, done properly.',
       includes: [
         'Full strip-out and disposal',
-        'Plumbing and electrical first and second fix',
+        'All plumbing and electrical work',
         'Stone-effect porcelain, floor to ceiling',
         'Walk-in shower or bath, wall-hung WC',
         'Vanity unit and LED mirror'
@@ -46,13 +47,13 @@ window.UNICKS_DATA = {
       id: 'b',
       name: 'Signature',
       from: 12950,
-      summary: 'Adds lighting, brass fittings and underfloor heating.',
+      summary: 'Adds built-in lighting, brushed brass and underfloor heating.',
       featured: true,
       includes: [
         'Everything in Essential',
         'Lit shower niche and LED plinth lighting',
         'Floating vanity with stone trough basin',
-        'Brushed brass brassware throughout',
+        'Brushed brass taps and fittings',
         'Electric underfloor heating'
       ]
     },
@@ -60,7 +61,7 @@ window.UNICKS_DATA = {
       id: 'c',
       name: 'Prestige',
       from: 18950,
-      summary: 'Our top finish, with a stone bench, rain shower and star floor.',
+      summary: 'Our top finish, with a stone bench and a star inlay in the floor.',
       includes: [
         'Everything in Signature',
         'Built-in stone shower bench, under-lit',

@@ -3,12 +3,16 @@
 Static site for **UNICKS** (`@custombyunicks`). Plain HTML/CSS/JS, no build step.
 
 ```
-index.html                 home: hero, three entry points, story, work, package teaser, contact
-packages.html              configurator: 1 choose package, 2 tick options, 3 send
-assets/js/packages-data.js packages, options and prices (the only file to edit for pricing)
-assets/js/main.js          menu, slides, configurator, forms
-assets/css/style.css       all styles, tokens in :root
-assets/img/                photography + mark.jpg (the US star monogram)
+index.html                 home: hero, three ways in, why us, work, how it works, packages, survey form
+packages.html              price builder: 1 package, 2 extras, 3 book a survey
+privacy.html               privacy notice (needed because the forms collect personal details)
+404.html                   page-not-found (uses root links, works on the real domain)
+assets/js/packages-data.js packages, extras and prices (the only file to edit for pricing)
+assets/js/main.js          header, menu, slides, work rail, price builder, forms
+assets/css/style.css       all styles, colours and fonts set in :root at the top
+assets/fonts/              Cormorant Garamond and Jost, served from the site (no Google requests)
+assets/img/                photos (.jpg plus smaller .webp copies), logo mark, icons, share image
+robots.txt, sitemap.xml    for search engines
 ```
 
 Run locally: `python3 -m http.server 8000`, open http://localhost:8000.
@@ -43,10 +47,23 @@ var CONTACT_EMAIL = '';   // mailto fallback only
 
 Formspree (50/month free) or Web3Forms (250/month free) both work as-is.
 
+Every enquiry includes **How did you find us?** (Google, Instagram, Facebook,
+recommended, other), so you can see which channel brings in work. Enquiries from
+the packages page also include the package, extras and guide price, plus a link
+that reopens the exact same choice.
+
 ## Placeholders
 
 Unknowns are shown with a gold dashed underline: search the HTML for `class="ph"`
-(phone, email, areas, response time, build time, company number).
+(phone, email, areas, reply time, build time, company number, and the gaps in
+`privacy.html`).
+
+## Checks run before release
+
+- W3C Nu HTML checker: 0 errors on every page, including the HTML the scripts build
+- axe accessibility audit (WCAG 2.1 AA): 0 violations
+- Chromium at 1440px and 390px: no console errors, no broken links or images,
+  no sideways scrolling, every in-page link lands on its section
 
 ---
 
@@ -93,4 +110,5 @@ The canonical tags already point there.
 
 The newest rooms (`project-star-*.jpg`, `project-cloakroom.jpg`) are full
 resolution. The older ones are Instagram screenshots; swap in originals when
-available, same filenames.
+available, same filenames. After replacing a photo, regenerate its `-640.webp`
+and `-1080.webp` copies (any image tool, quality around 80).
