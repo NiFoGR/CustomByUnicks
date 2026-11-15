@@ -127,7 +127,7 @@ var CONTACT_EMAIL = '';
   if (teaser && DATA) {
     teaser.innerHTML = DATA.packages.map(function (p, i) {
       return '<article class="tier rv' + (p.featured ? ' is-featured' : '') + '">' +
-        tierHTML(p, i, '<a class="btn' + (p.featured ? ' btn--solid' : '') + '" href="packages.html?p=' + p.id + '#customise">Price ' + esc(p.name) + ' ' + ARROW + '</a>') +
+        tierHTML(p, i, '<a class="btn' + (p.featured ? ' btn--solid' : '') + '" href="installations.html?p=' + p.id + '#customise">Price ' + esc(p.name) + ' ' + ARROW + '</a>') +
         '</article>';
     }).join('');
   }
@@ -403,8 +403,11 @@ var CONTACT_EMAIL = '';
       e.preventDefault();
       if (!validate()) return;
       if (form.hasAttribute('data-build')) {
-        form.elements.build.value = buildText;
-        form.elements.build_link.value = buildText ? location.href.split('#')[0] : '';
+        // the 3D designer provides its own description and link; the price builder uses buildText
+        var b = typeof window.UNICKS_BUILD === 'function' ? window.UNICKS_BUILD()
+          : { text: buildText, link: buildText ? location.href.split('#')[0] : '' };
+        form.elements.build.value = b.text;
+        form.elements.build_link.value = b.link;
       }
 
       var fd = new FormData(form);
@@ -418,7 +421,7 @@ var CONTACT_EMAIL = '';
         }
         var body = ['Name: ' + fd.get('name'), 'Phone: ' + fd.get('phone'), 'Email: ' + fd.get('email'),
           'Postcode: ' + fd.get('postcode'), 'Found us via: ' + (fd.get('source') || 'not given'), '', fd.get('message') || ''];
-        if (fd.get('build')) body.push('', 'Package and extras:', fd.get('build'), fd.get('build_link'));
+        if (fd.get('build')) body.push('', 'Their choices:', fd.get('build'), fd.get('build_link'));
         location.href = 'mailto:' + CONTACT_EMAIL + '?subject=' + encodeURIComponent('Survey request from ' + fd.get('name')) +
           '&body=' + encodeURIComponent(body.join('\n'));
         setMsg('Opening your email app to send this.', true);

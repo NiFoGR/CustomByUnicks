@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Design Your Bathroom in 3D | UNICKS</title>
+<meta name="description" content="Design your bathroom in 3D. Choose the stone, metal finish, lighting and extras, see your guide price, then send the design to UNICKS to build.">
+<meta name="theme-color" content="#0b0a09">
+<meta name="color-scheme" content="dark">
+<link rel="canonical" href="https://unicks.co.uk/design.html">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="UNICKS">
+<meta property="og:locale" content="en_GB">
+<meta property="og:url" content="https://unicks.co.uk/design.html">
+<meta property="og:title" content="Design Your Bathroom in 3D | UNICKS">
+<meta property="og:description" content="Pick every finish and watch the room change. Then send it to us to build.">
+<meta property="og:image" content="https://unicks.co.uk/assets/img/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+
+<link rel="preload" href="assets/fonts/cormorant.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/jost.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/style.css">
+<script type="importmap">{"imports":{"three":"./assets/vendor/three/three.module.min.js","three/addons/":"./assets/vendor/three/addons/"}}</script>
+<link rel="modulepreload" href="assets/vendor/three/three.module.min.js">
+<link rel="modulepreload" href="assets/js/studio-scene.js">
+<script>(function(d){d.classList.add('js');try{if(sessionStorage.getItem('unicks-intro')||matchMedia('(prefers-reduced-motion: reduce)').matches)d.classList.add('no-intro')}catch(e){d.classList.add('no-intro')}window.__uFallback=setTimeout(function(){d.classList.add('fallback')},5500);if(d.classList.contains('no-intro')||!/index\.html$|\/$|installations\.html$/.test(location.pathname)){var go=function(){requestAnimationFrame(function(){d.classList.add('is-loaded')})},t=setTimeout(go,900);if(document.fonts&&document.fonts.load)Promise.all([document.fonts.load('400 1em "Cormorant Garamond"'),document.fonts.load('300 1em Jost')]).then(function(){clearTimeout(t);go()},function(){})}})(document.documentElement)</script>
+</head>
+<body class="is-studio">
+<div class="grain" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="hdr is-solid" data-hdr>
+  <div class="wrap hdr__in">
+    <a href="./" class="brand" aria-label="UNICKS home">
+      <img src="assets/img/mark.png" alt="" width="40" height="40">
+      <span class="brand__txt"><span class="brand__name">UNICKS</span><span class="brand__sub">Bathrooms</span></span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a href="installations.html">Installations</a>
+      <a href="design.html" aria-current="page">Custom design</a>
+      <a href="shop.html">Shop</a>
+      <a href="./#work">Our work</a>
+    </nav>
+    <a href="#send" class="btn">Send my design</a>
+    <button class="burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="drawer"><span></span><span></span></button>
+  </div>
+</header>
+
+<div class="drawer" id="drawer">
+  <nav aria-label="Mobile">
+    <a href="installations.html">Installations</a>
+    <a href="design.html">Custom design</a>
+    <a href="shop.html">Shop</a>
+    <a href="./#work">Our work</a>
+    <a href="./#contact">Contact</a>
+  </nav>
+  <a href="#send" class="btn btn--solid btn--block">Send my design</a>
+</div>
+
+<main id="main">
+
+<section class="studio" id="studio" aria-labelledby="studio-h">
+  <div class="studio__stage" data-stage>
+    <picture>
+      <source media="(max-width: 940px)" srcset="assets/img/studio-poster-m.webp">
+      <img class="studio__poster" src="assets/img/studio-poster.webp" alt="" width="1530" height="1236" fetchpriority="high">
+    </picture>
+    <div class="studio__canvas" data-canvas></div>
+    <span class="studio__dim" data-dim="w" hidden></span>
+    <span class="studio__dim" data-dim="l" hidden></span>
+    <div class="studio__load" aria-hidden="true"><span class="studio__led"></span><span>Building your room</span></div>
+    <div class="studio__bar">
+      <div class="studio__views" role="group" aria-label="Camera">
+        <button type="button" data-view="overview" aria-pressed="true">Room</button>
+        <button type="button" data-view="vanity" aria-pressed="false">Vanity</button>
+        <button type="button" data-view="shower" aria-pressed="false">Shower</button>
+        <button type="button" data-view="bath" aria-pressed="false" hidden>Bath</button>
+        <button type="button" data-view="plan" aria-pressed="false">Plan</button>
+      </div>
+      <button type="button" class="studio__mood" data-mood aria-pressed="false"><span class="studio__switch" aria-hidden="true"></span>Evening light</button>
+    </div>
+    <p class="studio__hint">Drag to look around. Scroll or pinch to zoom.</p>
+    <p class="studio__fail" data-fail hidden>The 3D view can't run on this device, but everything else works. Pick your finishes and send them to us.</p>
+    <p class="sr-only" data-sum></p>
+  </div>
+
+  <div class="studio__panel">
+    <div class="studio__head">
+      <p class="eyebrow">Custom design</p>
+      <h1 id="studio-h">Design your bathroom</h1>
+      <p class="lede">Pick each finish and the room changes as you go. When it looks right, send it to us and we'll build exactly that.</p>
+    </div>
+    <div class="studio__looks">
+      <p class="studio__label">Start from one of ours</p>
+      <div class="looks" data-looks></div>
+    </div>
+    <div class="studio__tabs" role="tablist" aria-label="Design steps" data-tabs></div>
+    <div class="studio__body" data-panels></div>
+    <div class="studio__foot">
+      <div class="studio__total"><span>Guide price</span><strong data-total>£0</strong></div>
+      <a href="#send" class="btn btn--solid btn--block">Send my design</a>
+      <div class="studio__acts">
+        <button type="button" data-copy>Copy link</button>
+        <button type="button" data-save>Save image</button>
+      </div>
+      <p class="studio__note" data-note></p>
+    </div>
+  </div>
+</section>
+
+<section class="cfg-step cfg-step--alt" id="send">
+  <div class="wrap contact">
+    <div>
+      <p class="eyebrow">Send it</p>
+      <h2>Send us your design</h2>
+      <p class="lede">We'll call to book a free survey. You get drawings and a fixed quote in writing for this exact design, and nothing is ordered until you say yes.</p>
+      <ol class="next">
+        <li><b>Survey</b><span>We measure up and bring stone samples.</span></li>
+        <li><b>Drawings and quote</b><span>Your design drawn to size, every item priced.</span></li>
+        <li><b>Build</b><span>Our own team fits all of it.</span></li>
+      </ol>
+    </div>
+
+    <form class="form" data-form data-build novalidate>
+      <div class="form__msg" role="status" aria-live="polite" tabindex="-1"></div>
+      <div class="form__row">
+        <div class="field">
+          <label for="d-name">Name</label>
+          <input id="d-name" name="name" autocomplete="name" required>
+          <span class="field__err">Please add your name.</span>
+        </div>
+        <div class="field">
+          <label for="d-phone">Phone</label>
+          <input id="d-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required>
+          <span class="field__err">Please add a phone number.</span>
+        </div>
+      </div>
+      <div class="form__row">
+        <div class="field">
+          <label for="d-email">Email</label>
+          <input id="d-email" name="email" type="email" autocomplete="email" required>
+          <span class="field__err">Please check your email address.</span>
+        </div>
+        <div class="field">
+          <label for="d-post">Postcode</label>
+          <input id="d-post" name="postcode" autocomplete="postal-code" autocapitalize="characters" required>
+          <span class="field__err">We need this to check we cover your area.</span>
+        </div>
+      </div>
+      <div class="field">
+        <label for="d-source">How did you find us? <small>(optional)</small></label>
+        <select id="d-source" name="source">
+          <option value="">Choose one</option>
+          <option>Google</option>
+          <option>Instagram</option>
+          <option>Facebook</option>
+          <option>Recommended by someone</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="d-msg">Anything else? <small>(optional)</small></label>
+        <textarea id="d-msg" name="message" rows="4" placeholder="The shape of the room and when you'd like it done"></textarea>
+      </div>
+      <input type="hidden" name="build">
+      <input type="hidden" name="build_link">
+      <div class="hp" aria-hidden="true"><label>Company <input name="company" tabindex="-1" autocomplete="off"></label></div>
+      <button class="btn btn--solid btn--block" type="submit">Send my design</button>
+      <p class="form__note">Your design and a link that reopens it are sent with this form.</p>
+    </form>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="head head--center">
+      <p class="eyebrow rv">Good to know</p>
+      <h2 class="rv">Questions</h2>
+    </div>
+    <div class="faq">
+      <details class="rv">
+        <summary>Will it really look like this?</summary>
+        <p>Very close. Real stone varies from slab to slab, so we bring samples to the survey and you pick the actual slabs before anything is cut.</p>
+      </details>
+      <details class="rv">
+        <summary>My room isn't a simple rectangle</summary>
+        <p>Set the nearest size and tell us about the shape in the message box. We draw the real layout after the survey.</p>
+      </details>
+      <details class="rv">
+        <summary>Can I change things after I send it?</summary>
+        <p>Yes. Nothing is fixed until you've approved the drawings and the quote.</p>
+      </details>
+      <details class="rv">
+        <summary>I want something that isn't in the designer</summary>
+        <p>Add it to the message box. Most things can be done, and we'll price it with the rest.</p>
+      </details>
+      <details class="rv">
+        <summary>Is the price on screen what I pay?</summary>
+        <p>It's a guide. After the survey you get a fixed quote in writing, and that's what you pay.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<div class="pbar pbar--studio" data-pbar aria-hidden="true">
+  <div><small>Guide price</small><strong data-total>£0</strong></div>
+  <a href="#send" class="btn btn--solid" tabindex="-1">Send design</a>
+</div>
+
+<footer class="ftr">
+  <div class="wrap">
+    <div class="ftr__top">
+      <div>
+        <a href="./" class="brand" aria-label="UNICKS home">
+          <img src="assets/img/mark.png" alt="" width="40" height="40" loading="lazy">
+          <span class="brand__txt"><span class="brand__name">UNICKS</span><span class="brand__sub">Bathrooms</span></span>
+        </a>
+        <p>Luxury bathrooms, designed and fitted by one team.</p>
+      </div>
+      <div>
+        <p class="ftr__h">Explore</p>
+        <ul>
+          <li><a href="installations.html">Installations</a></li>
+          <li><a href="design.html">Custom design</a></li>
+          <li><a href="shop.html">Shop</a></li>
+          <li><a href="./#work">Our work</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="ftr__h">Contact</p>
+        <ul>
+          <li><span class="ph">[Phone]</span></li>
+          <li><span class="ph">[Email]</span></li>
+          <li><a href="https://www.instagram.com/custombyunicks" target="_blank" rel="noopener">@custombyunicks</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="ftr__btm">
+      <span>&copy; <span data-year>2026</span> UNICKS. Company no. <span class="ph">[Add number]</span></span>
+      <nav aria-label="Legal"><a href="privacy.html">Privacy</a></nav>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/studio-data.js"></script>
+<script src="assets/js/main.js" defer></script>
+<script type="module" src="assets/js/studio.js"></script>
+</body>
+</html>
