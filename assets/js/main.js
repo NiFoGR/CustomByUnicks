@@ -25,7 +25,23 @@ var CONTACT_EMAIL = '';
     return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; });
   };
 
+  clearTimeout(window.__uFallback);
   $$('[data-year]').forEach(function (el) { el.textContent = new Date().getFullYear(); });
+
+  /* ---------- Opening: logo, gold line, curtain up (first page of a visit only) ---------- */
+  var root = document.documentElement, intro = $('.intro');
+  var loaded = function () { document.body.classList.add('is-loaded'); };
+  if (intro && !root.classList.contains('no-intro')) {
+    try { sessionStorage.setItem('unicks-intro', '1'); } catch (e) {}
+    setTimeout(function () { intro.classList.add('is-out'); }, 1500);
+    setTimeout(loaded, 1650);
+    setTimeout(function () { intro.remove(); }, 2900);
+  } else {
+    var go = function () { requestAnimationFrame(loaded); };
+    if (document.fonts && document.fonts.ready) {
+      Promise.race([document.fonts.ready, new Promise(function (r) { setTimeout(r, 500); })]).then(go);
+    } else { go(); }
+  }
 
   /* ---------- Header: clear over the hero, solid once you scroll ---------- */
   var hdr = $('[data-hdr]'), ticking = false;
@@ -289,10 +305,12 @@ var CONTACT_EMAIL = '';
   }
 
   /* ---------- Reveal on scroll, staggered within each group ---------- */
-  var rv = $$('.rv'), groups = new Map();
+  // section headings rise out of a mask: wrap their text once
+  $$('h2.rv').forEach(function (h) { h.innerHTML = '<span class="mask"><span>' + h.innerHTML + '</span></span>'; });
+  var rv = $$('.rv, [data-reveal]'), groups = new Map();
   rv.forEach(function (el) {
     var n = groups.get(el.parentElement) || 0;
-    el.style.setProperty('--i', Math.min(n, 4));
+    el.style.setProperty('--i', Math.min(n, 5));
     groups.set(el.parentElement, n + 1);
   });
   if ('IntersectionObserver' in window && !REDUCED) {
@@ -304,6 +322,28 @@ var CONTACT_EMAIL = '';
     rv.forEach(function (el) { io.observe(el); });
   } else {
     rv.forEach(function (el) { el.classList.add('is-in'); });
+  }
+
+  /* ---------- Depth: things move at different speeds as you scroll ---------- */
+  if (!REDUCED) {
+    var hero = $('.hero__media');
+    var layers = $$('[data-parallax]');                 // move the element itself
+    var inner = $$('.door, .work__img');                 // move the photo inside its frame
+    var star = $('[data-spin]');
+    var vh = window.innerHeight, queued = false;
+    var offset = function (el) { var r = el.getBoundingClientRect(); return r.bottom < -200 || r.top > vh + 200 ? null : r.top + r.height / 2 - vh / 2; };
+    var frame = function () {
+      queued = false;
+      if (hero) { var hy = window.scrollY; if (hy < vh * 1.2) hero.style.setProperty('--dy', (hy * 0.12).toFixed(1) + 'px'); }
+      layers.forEach(function (el) { var o = offset(el); if (o !== null) el.style.setProperty('--py', (o * parseFloat(el.dataset.parallax)).toFixed(1) + 'px'); });
+      inner.forEach(function (el) { var o = offset(el); if (o !== null) el.style.setProperty('--dy', (o * -0.06).toFixed(1) + 'px'); });
+      if (star) { var o = offset(star.parentElement); if (o !== null) star.style.setProperty('--rot', (o * -0.04).toFixed(2) + 'deg'); }
+    };
+    var queue = function () { if (!queued) { queued = true; requestAnimationFrame(frame); } };
+    window.addEventListener('scroll', queue, { passive: true });
+    window.addEventListener('resize', function () { vh = window.innerHeight; queue(); });
+    if (rail) rail.addEventListener('scroll', queue, { passive: true });
+    frame();
   }
 
   /* ---------- Forms ---------- */

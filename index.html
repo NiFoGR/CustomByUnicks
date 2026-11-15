@@ -40,9 +40,17 @@
   "sameAs": ["https://www.instagram.com/custombyunicks"]
 }
 </script>
-<script>document.documentElement.classList.add('js')</script>
+<script>(function(d){d.classList.add('js');try{if(sessionStorage.getItem('unicks-intro')||matchMedia('(prefers-reduced-motion: reduce)').matches)d.classList.add('no-intro')}catch(e){d.classList.add('no-intro')}window.__uFallback=setTimeout(function(){d.classList.add('fallback')},4500)})(document.documentElement)</script>
 </head>
 <body>
+<div class="intro" aria-hidden="true">
+  <div class="intro__in">
+    <img src="assets/img/mark.png" alt="" width="96" height="96">
+    <span class="intro__word">UNICKS</span>
+    <span class="intro__led"></span>
+  </div>
+</div>
+<div class="grain" aria-hidden="true"></div>
 <a class="skip" href="#main">Skip to content</a>
 
 <header class="hdr" data-hdr>
@@ -77,20 +85,21 @@
 <!-- HERO -->
 <section class="hero">
   <div class="hero__txt">
-    <p class="eyebrow rv">Luxury bathrooms</p>
-    <h1 class="rv"><span class="gold">Your bathroom,</span> done properly.</h1>
-    <p class="lede rv">We design and fit high-end bathrooms from start to finish. Pick a package, add the extras you want and see your price in two minutes.</p>
-    <div class="hero__btns rv">
+    <p class="eyebrow" data-hero>Luxury bathrooms</p>
+    <h1 class="hero__h"><span class="ln"><span class="gold">Your bathroom,</span></span> <span class="ln"><span>done properly.</span></span></h1>
+    <p class="lede" data-hero>We design and fit high-end bathrooms from start to finish. Pick a package, add the extras you want and see your price in two minutes.</p>
+    <div class="hero__btns" data-hero>
       <a href="packages.html" class="btn btn--solid">Get your price
         <svg viewBox="0 0 15 10" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M1 5h12M9.5 1.5L13 5 9.5 8.5"/></svg></a>
       <a href="#work" class="btn">See our work</a>
     </div>
-    <ul class="assure rv">
+    <ul class="assure" data-hero>
       <li>Free survey</li>
       <li>Fixed quote in writing</li>
     </ul>
   </div>
   <div class="hero__media" data-slides>
+    <span class="hero__led" aria-hidden="true"></span>
     <picture>
       <source type="image/webp" srcset="assets/img/project-star-dark-640.webp 640w, assets/img/project-star-dark-1080.webp 1080w" sizes="(max-width: 940px) 100vw, 53vw">
       <img class="is-on" src="assets/img/project-star-dark.jpg" width="1086" height="1225" alt="Grey marble shower room with a brass-framed screen, lit stone bench and star inlay in the floor" fetchpriority="high">
@@ -113,10 +122,10 @@
 
 <!-- THREE WAYS IN -->
 <section class="doors" aria-label="Start here">
-  <a href="#process" class="door">
+  <a href="#process" class="door" data-reveal>
     <picture>
-      <source type="image/webp" srcset="assets/img/project-onyx-wetroom-640.webp 640w, assets/img/project-onyx-wetroom-1080.webp 1080w" sizes="(max-width: 940px) 100vw, 33vw">
-      <img src="assets/img/project-onyx-wetroom.jpg" width="1080" height="1590" alt="" loading="lazy" decoding="async">
+      <source type="image/webp" srcset="assets/img/project-stone-ensuite-640.webp 640w, assets/img/project-stone-ensuite-1080.webp 1080w" sizes="(max-width: 940px) 100vw, 33vw">
+      <img src="assets/img/project-stone-ensuite.jpg" width="1080" height="1420" alt="" loading="lazy" decoding="async">
     </picture>
     <div class="door__body">
       <h2 class="door__t">Full refits</h2>
@@ -124,10 +133,10 @@
       <span class="link">How it works <svg viewBox="0 0 15 10" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M1 5h12M9.5 1.5L13 5 9.5 8.5"/></svg></span>
     </div>
   </a>
-  <a href="packages.html" class="door">
+  <a href="packages.html" class="door" data-reveal>
     <picture>
-      <source type="image/webp" srcset="assets/img/project-star-light-640.webp 640w, assets/img/project-star-light-1080.webp 1080w" sizes="(max-width: 940px) 100vw, 33vw">
-      <img src="assets/img/project-star-light.jpg" width="1080" height="1205" alt="" loading="lazy" decoding="async">
+      <source type="image/webp" srcset="assets/img/project-brass-suite-640.webp 640w, assets/img/project-brass-suite-1080.webp 1080w" sizes="(max-width: 940px) 100vw, 33vw">
+      <img src="assets/img/project-brass-suite.jpg" width="1080" height="1365" alt="" loading="lazy" decoding="async">
     </picture>
     <div class="door__body">
       <h2 class="door__t">Packages</h2>
@@ -135,7 +144,7 @@
       <span class="link">Get your price <svg viewBox="0 0 15 10" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M1 5h12M9.5 1.5L13 5 9.5 8.5"/></svg></span>
     </div>
   </a>
-  <a href="#work" class="door">
+  <a href="#work" class="door" data-reveal>
     <picture>
       <source type="image/webp" srcset="assets/img/project-cloakroom-640.webp 640w, assets/img/project-cloakroom-1080.webp 1080w" sizes="(max-width: 940px) 100vw, 33vw">
       <img src="assets/img/project-cloakroom.jpg" width="1023" height="1320" alt="" loading="lazy" decoding="async">
@@ -159,11 +168,20 @@
       <p class="lede rv">We do the whole job ourselves, from the first drawing to the final seal. You deal with one team at one agreed price, and you always know who to call.</p>
       <a href="#process" class="link rv">See how it works <svg viewBox="0 0 15 10" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M1 5h12M9.5 1.5L13 5 9.5 8.5"/></svg></a>
     </div>
-    <div class="why__media rv">
-      <picture>
-        <source type="image/webp" srcset="assets/img/project-brass-suite-640.webp 640w, assets/img/project-brass-suite-1080.webp 1080w" sizes="(max-width: 940px) 100vw, 50vw">
-        <img src="assets/img/project-brass-suite.jpg" width="1080" height="1365" alt="Marble bathroom with a freestanding bath, brushed brass towel rail and lit shelves" loading="lazy" decoding="async">
-      </picture>
+    <div class="why__media">
+      <span class="why__frame" data-parallax="-0.06" aria-hidden="true"></span>
+      <figure class="why__main" data-reveal data-parallax="0.04">
+        <picture>
+          <source type="image/webp" srcset="assets/img/detail-niche.webp">
+          <img src="assets/img/detail-niche.jpg" width="704" height="896" alt="Lit recessed shelf in a cream marble wall, with glass shelves and an LED line beside it" loading="lazy" decoding="async">
+        </picture>
+      </figure>
+      <figure class="why__inset" data-reveal data-parallax="-0.1">
+        <picture>
+          <source type="image/webp" srcset="assets/img/detail-star.webp">
+          <img src="assets/img/detail-star.jpg" width="1008" height="584" alt="Star pattern set into a grey marble floor, lit by an LED line under the vanity" loading="lazy" decoding="async">
+        </picture>
+      </figure>
     </div>
   </div>
 </section>
@@ -182,43 +200,43 @@
       </div>
     </div>
 
-    <div class="rail rv" id="rail" tabindex="0" role="region" aria-label="Recent bathrooms, scroll sideways">
-      <figure class="work">
+    <div class="rail" id="rail" tabindex="0" role="region" aria-label="Recent bathrooms, scroll sideways">
+      <figure class="work" data-reveal>
         <div class="work__img"><picture>
           <source type="image/webp" srcset="assets/img/project-star-dark-640.webp 640w, assets/img/project-star-dark-1080.webp 1080w" sizes="(max-width: 940px) 74vw, 33vw">
           <img src="assets/img/project-star-dark.jpg" width="1086" height="1225" alt="Grey marble shower room with a star inlay in the floor" loading="lazy" decoding="async">
         </picture></div>
         <figcaption><strong>Shower room</strong><span>Grey marble, star floor inlay</span></figcaption>
       </figure>
-      <figure class="work">
+      <figure class="work" data-reveal>
         <div class="work__img"><picture>
           <source type="image/webp" srcset="assets/img/project-star-light-640.webp 640w, assets/img/project-star-light-1080.webp 1080w" sizes="(max-width: 940px) 74vw, 33vw">
           <img src="assets/img/project-star-light.jpg" width="1080" height="1205" alt="Cream marble shower room with a star inlay in the floor" loading="lazy" decoding="async">
         </picture></div>
         <figcaption><strong>Shower room</strong><span>Cream marble, star floor inlay</span></figcaption>
       </figure>
-      <figure class="work">
+      <figure class="work" data-reveal>
         <div class="work__img"><picture>
           <source type="image/webp" srcset="assets/img/project-cloakroom-640.webp 640w, assets/img/project-cloakroom-1080.webp 1080w" sizes="(max-width: 940px) 74vw, 33vw">
           <img src="assets/img/project-cloakroom.jpg" width="1023" height="1320" alt="Cream marble cloakroom with a wall-hung toilet, lit shelf and brass towel rail" loading="lazy" decoding="async">
         </picture></div>
         <figcaption><strong>Cloakroom</strong><span>Cream marble, brass towel rail</span></figcaption>
       </figure>
-      <figure class="work">
+      <figure class="work" data-reveal>
         <div class="work__img"><picture>
           <source type="image/webp" srcset="assets/img/project-onyx-wetroom-640.webp 640w, assets/img/project-onyx-wetroom-1080.webp 1080w" sizes="(max-width: 940px) 74vw, 33vw">
           <img src="assets/img/project-onyx-wetroom.jpg" width="1080" height="1590" alt="Black marble wet room with a lit stone bench" loading="lazy" decoding="async">
         </picture></div>
         <figcaption><strong>Wet room</strong><span>Black marble, stone bench</span></figcaption>
       </figure>
-      <figure class="work">
+      <figure class="work" data-reveal>
         <div class="work__img"><picture>
           <source type="image/webp" srcset="assets/img/project-stone-ensuite-640.webp 640w, assets/img/project-stone-ensuite-1080.webp 1080w" sizes="(max-width: 940px) 74vw, 33vw">
           <img src="assets/img/project-stone-ensuite.jpg" width="1080" height="1420" alt="Stone en-suite with a lit mirror and timber vanity" loading="lazy" decoding="async">
         </picture></div>
         <figcaption><strong>En-suite</strong><span>Stone tiles, lit mirror</span></figcaption>
       </figure>
-      <figure class="work">
+      <figure class="work" data-reveal>
         <div class="work__img"><picture>
           <source type="image/webp" srcset="assets/img/project-brass-suite-640.webp 640w, assets/img/project-brass-suite-1080.webp 1080w" sizes="(max-width: 940px) 74vw, 33vw">
           <img src="assets/img/project-brass-suite.jpg" width="1080" height="1365" alt="Marble family bathroom with a freestanding bath" loading="lazy" decoding="async">
@@ -235,7 +253,8 @@
 </section>
 
 <!-- HOW IT WORKS -->
-<section class="section section--alt" id="process">
+<section class="section section--alt has-star" id="process">
+  <svg class="bigstar" data-spin viewBox="0 0 100 100" aria-hidden="true"><path d="M50 0l7.5 42.5L100 50l-42.5 7.5L50 100l-7.5-42.5L0 50l42.5-7.5z"/></svg>
   <div class="wrap">
     <div class="head">
       <div>

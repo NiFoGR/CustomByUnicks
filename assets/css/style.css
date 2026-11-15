@@ -148,7 +148,7 @@ p:last-child{margin-bottom:0}
 .assure{list-style:none;margin:2.2rem 0 0;padding:0;display:flex;flex-wrap:wrap;gap:.5rem 1.6rem;font-size:.86rem;color:var(--muted)}
 .assure li::before{content:"";display:inline-block;width:8px;height:8px;margin-right:.6rem;background:var(--star) center/contain no-repeat;vertical-align:1px}
 .hero__media{position:relative;overflow:hidden;background:var(--surface)}
-.hero__media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.06);transition:opacity 1.4s var(--ease),transform 7s linear}
+.hero__media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.06);scale:1.1;translate:0 var(--dy,0);transition:opacity 1.4s var(--ease),transform 7s linear,scale 2.6s var(--ease-out)}
 .hero__media img.is-on{opacity:1;transform:scale(1)}
 .hero__media::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,var(--ink) 0,rgba(11,10,9,0) 20%),linear-gradient(180deg,rgba(11,10,9,.55) 0,rgba(11,10,9,0) 18%)}
 .hero__dots{position:absolute;right:clamp(16px,3vw,40px);bottom:clamp(16px,3vw,36px);z-index:2;display:flex;gap:1.1rem;padding:.15rem .9rem;background:rgba(11,10,9,.6);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
@@ -173,9 +173,14 @@ p:last-child{margin-bottom:0}
 .why .lede{margin-top:1.5rem}
 .why .lede + .lede{margin-top:0}
 .why .link{margin-top:1.4rem}
-.why__media{position:relative;aspect-ratio:4/5;overflow:hidden}
-.why__media img{width:100%;height:100%;object-fit:cover}
-.why__media::after{content:"";position:absolute;inset:14px;border:1px solid rgba(226,199,146,.28);pointer-events:none}
+.why__media{position:relative;aspect-ratio:1/1.06}
+.why__main,.why__inset{position:absolute;overflow:hidden;background:var(--surface)}
+.why__main{top:0;right:0;width:72%;height:84%;box-shadow:0 50px 90px -40px rgba(0,0,0,.9)}
+.why__inset{left:0;bottom:0;width:60%;aspect-ratio:1008/584;z-index:2;overflow:visible;box-shadow:0 36px 70px -24px rgba(0,0,0,.95),0 0 0 1px rgba(226,199,146,.16)}
+.why__main img,.why__inset img{width:100%;height:100%;object-fit:cover}
+.why__inset picture{display:block;width:100%;height:100%;overflow:hidden}
+.why__inset::after{content:"";position:absolute;left:10%;right:10%;bottom:0;height:1px;background:var(--gold-lt);box-shadow:0 0 12px 1px rgba(226,199,146,.7),0 0 34px 4px rgba(198,161,91,.35)}
+.why__frame{position:absolute;top:7%;right:7%;width:72%;height:84%;border:1px solid var(--line)}
 
 /* ---------- Work rail ---------- */
 .rail{
@@ -357,6 +362,20 @@ p:last-child{margin-bottom:0}
 .faq details[open] summary::after{transform:rotate(135deg)}
 .faq details p{color:var(--muted);padding-bottom:1.5rem;max-width:66ch}
 
+/* photo behind the packages heading: dim, warm, fading into the page */
+.pagehead--photo{position:relative;overflow:hidden;padding-bottom:clamp(64px,8vw,104px)}
+.pagehead__bg{position:absolute;inset:0;z-index:0;pointer-events:none;
+  -webkit-mask-image:linear-gradient(180deg,rgba(0,0,0,.9),rgba(0,0,0,.35) 60%,transparent);mask-image:linear-gradient(180deg,rgba(0,0,0,.9),rgba(0,0,0,.35) 60%,transparent)}
+.pagehead__bg img{width:100%;height:100%;object-fit:cover;object-position:50% 40%;opacity:.5;filter:saturate(.9)}
+.pagehead--photo::after{content:"";position:absolute;inset:0;z-index:0;background:radial-gradient(ellipse 55% 60% at 50% 45%,rgba(11,10,9,.72),rgba(11,10,9,.35) 80%);pointer-events:none}
+.pagehead--photo > .wrap{position:relative;z-index:1}
+.pagehead--photo .bigstar{right:auto;left:50%;translate:-50% -50%;width:min(640px,95vw);stroke:rgba(198,161,91,.14)}
+@media (prefers-reduced-motion:no-preference){
+  .js .pagehead__bg img{scale:1.15;transition:scale 3s var(--ease-out)}
+  .js .is-loaded .pagehead__bg img{scale:1}
+  .js .stepper[data-hero]{transition-delay:.55s}
+}
+
 /* ---------- Simple pages (privacy, 404) ---------- */
 .prose{max-width:720px;margin-inline:auto}
 .prose h2{font-size:clamp(1.5rem,2.4vw,1.9rem);margin:2.6rem 0 .9rem}
@@ -375,6 +394,100 @@ p:last-child{margin-bottom:0}
   *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}
 }
 
+
+/* ==========================================================================
+   DEPTH AND LIGHT
+   His rooms are lit by hidden LED lines in stone, so the page borrows that:
+   warm glows behind sections, glowing gold lines, fine grain, and photos
+   that sit at different depths as you scroll.
+   ========================================================================== */
+.grain{position:fixed;inset:0;z-index:70;pointer-events:none;opacity:.07;mix-blend-mode:soft-light;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+.hero__txt{background:radial-gradient(ellipse 70% 55% at 10% 85%,rgba(198,161,91,.09),transparent 70%)}
+#why{background:radial-gradient(ellipse 60% 70% at 85% 30%,rgba(198,161,91,.07),transparent 70%),var(--ink-2)}
+#process{background:radial-gradient(ellipse 55% 80% at 100% 50%,rgba(198,161,91,.07),transparent 70%),var(--ink-2)}
+#contact{background:radial-gradient(ellipse 60% 70% at 0% 100%,rgba(198,161,91,.08),transparent 70%),var(--ink-2)}
+#packages{background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(198,161,91,.06),transparent 70%)}
+
+/* the gold seam between hero text and photo, like an LED strip */
+.hero__led{position:absolute;left:0;top:0;bottom:0;width:1px;z-index:3;pointer-events:none;
+  background:linear-gradient(180deg,rgba(226,199,146,0),var(--gold-lt) 25%,var(--gold) 75%,rgba(198,161,91,0));
+  box-shadow:0 0 14px 1px rgba(226,199,146,.55),0 0 40px 4px rgba(198,161,91,.25)}
+
+/* featured package gets a lit top edge; entry cards light up along the bottom */
+.tier.is-featured::before,.tier.is-picked::before{content:"";position:absolute;left:0;right:0;top:-1px;height:1px;background:var(--gold-lt);box-shadow:0 0 14px 1px rgba(226,199,146,.6),0 0 40px 4px rgba(198,161,91,.25)}
+.door::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;z-index:1;background:var(--gold-lt);box-shadow:0 0 14px 1px rgba(226,199,146,.6);transform:scaleX(0);transition:transform .8s var(--ease-out)}
+.door:hover::after{transform:scaleX(1)}
+.door img,.work__img img{scale:1.1;translate:0 var(--dy,0)}
+
+/* the logo star, very large and faint, turning with the scroll */
+.has-star{position:relative;overflow:hidden}
+.has-star > .wrap{position:relative;z-index:1}
+.bigstar{position:absolute;right:-10%;top:50%;width:min(760px,90vw);translate:0 -50%;rotate:var(--rot,0deg);fill:none;stroke:rgba(198,161,91,.18);stroke-width:.22;pointer-events:none}
+
+[data-parallax]{translate:0 var(--py,0)}
+
+/* opening: logo, wordmark, then a gold line switches on and the curtain lifts */
+.intro{position:fixed;inset:0;z-index:200;display:grid;place-items:center;background:var(--ink);
+  transition:transform 1.1s cubic-bezier(.77,0,.18,1),visibility 0s 1.15s;animation:introBail 0s 4.5s forwards}
+.intro__in{display:grid;justify-items:center;gap:1.3rem}
+.intro img{width:70px;height:70px;opacity:0;transform:scale(.8);animation:introMark 1.1s var(--ease-out) .1s forwards}
+.intro__word{font-family:var(--serif);font-size:1.15rem;letter-spacing:.7em;padding-left:.7em;color:var(--gold);opacity:0;animation:introFade .9s var(--ease-out) .4s forwards}
+.intro__led{display:block;width:min(240px,56vw);height:1px;background:var(--gold-lt);box-shadow:0 0 12px 1px rgba(226,199,146,.8),0 0 36px 4px rgba(198,161,91,.4);transform:scaleX(0);animation:introLed 1s var(--ease-out) .6s forwards}
+.intro.is-out{transform:translateY(-100%);visibility:hidden}
+.no-intro .intro,.fallback .intro{display:none}
+@keyframes introMark{to{opacity:1;transform:none}}
+@keyframes introFade{to{opacity:1}}
+@keyframes introLed{to{transform:none}}
+@keyframes introBail{to{visibility:hidden;opacity:0}}
+
+@media (prefers-reduced-motion:no-preference){
+  /* hero: lines rise out of their own baseline, photo wipes in, seam lights up */
+  .js .hero__h .ln{display:block;overflow:hidden;padding-bottom:.08em;margin-bottom:-.08em}
+  .js .hero__h .ln > span{display:block;transform:translateY(108%);transition:transform 1.3s var(--ease-out)}
+  .js .hero__h .ln:nth-child(2) > span{transition-delay:.12s}
+  .js [data-hero]{opacity:0;transform:translateY(18px);transition:opacity 1s var(--ease-out),transform 1.1s var(--ease-out)}
+  .js .eyebrow[data-hero]{transition-delay:.05s}
+  .js .lede[data-hero]{transition-delay:.4s}
+  .js .hero__btns[data-hero]{transition-delay:.55s}
+  .js .assure[data-hero]{transition-delay:.7s}
+  .js .hero__media{clip-path:inset(0 0 0 100%);transition:clip-path 1.5s cubic-bezier(.77,0,.18,1) .05s}
+  .js .hero__media img{scale:1.22}
+  .js .hero__led{transform:scaleY(0);transform-origin:top;transition:transform 1.6s var(--ease-out) .9s}
+  .js .hdr{transform:translateY(-100%);transition:transform 1s var(--ease-out) .35s,background-color .4s var(--ease),border-color .4s var(--ease)}
+  .js .is-loaded .hero__h .ln > span,.js .is-loaded [data-hero]{transform:none;opacity:1}
+  .js .is-loaded .hero__media{clip-path:inset(0)}
+  .js .is-loaded .hero__media img{scale:1.1}
+  .js .is-loaded .hero__led{transform:none}
+  .js .is-loaded .hdr{transform:none}
+
+  /* photos uncover from the bottom and settle back from a slight zoom */
+  .js [data-reveal] img{clip-path:inset(100% 0 0 0);scale:1.3;transition:clip-path 1.3s cubic-bezier(.77,0,.18,1),scale 2s var(--ease-out),transform 1.4s var(--ease-out);transition-delay:calc(var(--i,0) * 110ms)}
+  .js [data-reveal].is-in img{clip-path:inset(0);scale:1.1}
+  .js .why__main[data-reveal] img,.js .why__inset[data-reveal] img{scale:1.2}
+  .js .why__main[data-reveal].is-in img,.js .why__inset[data-reveal].is-in img{scale:1}
+  .js .door[data-reveal] .door__body,.js .work[data-reveal] figcaption{opacity:0;transform:translateY(16px);transition:opacity .9s var(--ease-out),transform 1s var(--ease-out);transition-delay:calc(var(--i,0) * 110ms + .5s)}
+  .js .door[data-reveal].is-in .door__body,.js .work[data-reveal].is-in figcaption{opacity:1;transform:none}
+  .js .why__frame{opacity:0;transition:opacity 1.4s var(--ease-out) .6s}
+  .js .why__media:has(.why__main.is-in) .why__frame{opacity:1}
+
+  /* section headings rise out of a mask */
+  .js h2.rv{opacity:1;transform:none}
+  .js h2.rv .mask{display:block;overflow:hidden;padding-bottom:.08em;margin-bottom:-.08em}
+  .js h2.rv .mask > span{display:block;transform:translateY(105%);transition:transform 1.2s var(--ease-out);transition-delay:calc(var(--i,0) * 90ms)}
+  .js h2.rv.is-in .mask > span{transform:none}
+}
+@media (max-width:940px) and (prefers-reduced-motion:no-preference){
+  .js .hero__led{transform:scaleX(0);transform-origin:left}
+  .js .is-loaded .hero__led{transform:none}
+  .js .hero__media{clip-path:inset(0 0 100% 0)}
+}
+/* if the script never runs, show everything after a few seconds */
+.fallback .rv,.fallback [data-hero],.fallback .hero__h .ln > span,.fallback h2.rv .mask > span,.fallback .door__body,.fallback figcaption,.fallback .why__frame{opacity:1!important;transform:none!important}
+.fallback .hero__media,.fallback [data-reveal] img{clip-path:none!important}
+.fallback .hdr{transform:none!important}
+
 /* ---------- Responsive ---------- */
 @media (max-width:1120px){
   .nav{gap:1.5rem}
@@ -391,12 +504,13 @@ p:last-child{margin-bottom:0}
   .hero__media{order:-1;aspect-ratio:4/3.3}
   .hero__media::after{background:linear-gradient(0deg,var(--ink) 0,rgba(11,10,9,0) 32%),linear-gradient(180deg,rgba(11,10,9,.6) 0,rgba(11,10,9,0) 28%)}
   .hero__txt{padding:12px var(--gut) 72px}
+  .hero__led{top:auto;right:0;width:auto;height:1px;background:linear-gradient(90deg,rgba(226,199,146,0),var(--gold-lt) 25%,var(--gold) 75%,rgba(198,161,91,0))}
   .doors{grid-template-columns:1fr}
   .door{min-height:320px}
   .door + .door{border-left:0;border-top:1px solid var(--line-soft)}
   .door p{min-height:0}
   .why,.contact{grid-template-columns:1fr}
-  .why__media{aspect-ratio:4/3.4;order:-1}
+  .why__media{order:-1;max-width:560px;width:100%;margin-inline:auto}
   .rail{grid-auto-columns:74%}
   .steps3{grid-template-columns:1fr;gap:2.6rem}
   .tiers{grid-template-columns:1fr}
