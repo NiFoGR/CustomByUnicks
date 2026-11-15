@@ -394,7 +394,8 @@ function init() {
   if (bar && 'IntersectionObserver' in window) {
     let inStudio = false, inSend = false;
     const upd = () => bar.classList.toggle('is-on', inStudio && !inSend);
-    new IntersectionObserver((es) => { inStudio = es[0].isIntersecting; upd(); }, { rootMargin: '-40% 0px 0px 0px' }).observe($('.studio__panel'));
+    // only once the options themselves are on screen, so it never covers the introduction
+    new IntersectionObserver((es) => { inStudio = es[0].isIntersecting; upd(); }, { rootMargin: '0px 0px -25% 0px' }).observe($('.studio__body'));
     new IntersectionObserver((es) => { inSend = es[0].isIntersecting; upd(); }).observe($('#send'));
   }
 
