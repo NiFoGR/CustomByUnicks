@@ -38,8 +38,8 @@ change the new thing, not the rules.
 - Square corners on everything. The only circles are small controls
   (step numbers, rail arrows, the light switch).
 - 1px hairlines only. Never thicker borders.
-- The one ornament is the four-point star from the logo: eyebrows, list
-  bullets, the large faint star behind some sections.
+- The one ornament is the four-point star from the logo, used small:
+  eyebrows and list bullets only.
 - The "LED line": 1px of `--gold-lt` with a soft glow. Used for the lit edge of
   a chosen or featured card, the seam beside the hero photo, the opening
   animation and the loading line in the 3D designer. Once per component.
@@ -47,7 +47,10 @@ change the new thing, not the rules.
 ## 4. Space and layout
 
 - Content width 1200px with side gutters `clamp(20px, 5vw, 56px)`.
-- Section padding `clamp(80px, 10vw, 136px)`; builder steps `clamp(56px, 7vw, 88px)`.
+- One spacing scale, set in `:root`: `--section` (above and below every
+  section, builder steps included), `--head-gap` (heading block to its
+  content) and `--lede-gap` (heading to the paragraph under it). Use these,
+  never one-off numbers.
 - Gaps between options and swatches: 8 to 10px. Between cards: 22 to 24px.
 - Inner padding of cards: `clamp(26px, 3vw, 38px)`; of panels: 22 to 28px.
 - Everything lines up on the same left edge inside `.wrap`. Centre only
