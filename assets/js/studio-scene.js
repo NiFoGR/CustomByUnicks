@@ -615,7 +615,29 @@ export function createStudio(host, opt) {
   /* ---------- vanity ---------- */
   function vanityPart() {
     const { L, vw, xv, basin } = P, z0 = -L / 2;
-    part('vanity', [vw, xv, L, st.vanity === 'stone', st.front, basin], { kind: 'fit', wall: 'back', pick: 'vanity' }, (g) => {
+    const ped = basin === 'pedestal';
+    part('vanity', ped ? [xv, L, 'pedestal'] : [vw, xv, L, st.vanity === 'stone', st.front, basin], { kind: 'fit', wall: 'back', pick: 'vanity' }, (g) => {
+      if (ped) {
+        // freestanding round stone basin, made in his workshop: a column with a bowl carved into the top
+        const R = 0.2, Hp = 0.86, zc = z0 + 0.3;
+        const col = new THREE.CylinderGeometry(R, R, Hp, 64, 1, true);
+        col.translate(0, Hp / 2, 0);
+        mesh(col, M.wall, g, xv, 0, zc);
+        const rim = new THREE.RingGeometry(0.155, R, 64); rim.rotateX(-Math.PI / 2);
+        mesh(rim, M.wall, g, xv, Hp, zc);
+        // the bowl's surface must face up and in; build the profile in whichever order gives that
+        const prof = [[0, Hp - 0.12], [0.09, Hp - 0.115], [0.135, Hp - 0.085], [0.152, Hp - 0.04], [0.155, Hp]].map((q) => new THREE.Vector2(q[0], q[1]));
+        let bowl = new THREE.LatheGeometry(prof, 64);
+        if (bowl.attributes.normal.getY(1) < 0) { bowl.dispose(); bowl = new THREE.LatheGeometry(prof.slice().reverse(), 64); }
+        mesh(bowl, M.wall, g, xv, 0, zc);
+        cyl(0.02, 0.004, M.metal, g, 'y', xv, Hp - 0.118, zc);
+        const reach = 0.3;
+        cyl(0.03, 0.012, M.metal, g, 'z', xv, Hp + 0.24, z0 + 0.006);
+        cyl(0.012, reach, M.metal, g, 'z', xv, Hp + 0.24, z0 + reach / 2);
+        cyl(0.014, 0.02, M.metal, g, 'z', xv, Hp + 0.24, z0 + reach);
+        [-1, 1].forEach((sgn) => { cyl(0.028, 0.01, M.metal, g, 'z', xv + sgn * 0.12, Hp + 0.24, z0 + 0.005); cyl(0.02, 0.045, M.metal, g, 'z', xv + sgn * 0.12, Hp + 0.24, z0 + 0.03); });
+        return;
+      }
       const cabMat = st.vanity === 'stone' ? M.wall : M.wood;
       if (st.front === 'fluted') {
         // carcass with a fluted front: rounded reeds across the full width
@@ -678,7 +700,13 @@ export function createStudio(host, opt) {
       }
     });
     // light under the vanity
-    if (P.lit.plinth) {
+    if (ped) {
+      if (P.lit.plinth) part('plinthGlow', [xv, L, 'pedestal'], { kind: 'light' }, (g) => {
+        const ring = mesh(new THREE.TorusGeometry(0.205, 0.004, 8, 96), M.strip, g, xv, 0.008, z0 + 0.3, false); ring.rotation.x = Math.PI / 2; ring.userData.noPick = true;
+        plane(1.1, 1.1, glowMat(S.round, 1.0), g, xv, DECAL, z0 + 0.3, -Math.PI / 2);
+      });
+      else part('vanityShade', [xv, L, 'pedestal'], { kind: 'static' }, (g) => { plane(0.75, 0.75, AO.round, g, xv, DECAL, z0 + 0.3, -Math.PI / 2); });
+    } else if (P.lit.plinth) {
       part('plinthGlow', [vw, xv, L], { kind: 'light' }, (g) => {
         strip(vw - 0.05, 0.006, 0.006, g, xv, 0.37, z0 + 0.39);
         plane(vw + 0.5, 0.9, glowMat(S.down, 0.8), g, xv, DECAL, z0 + 0.46, -Math.PI / 2);

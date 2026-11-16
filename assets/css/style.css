@@ -668,9 +668,6 @@ p:last-child{margin-bottom:0}
 @media (max-width:940px){
   .studio__mood{position:absolute;right:0;top:auto;bottom:-1px;translate:0 calc(min(52svh,560px) - 100% - 20px)}
 }
-/* plain three-column list (no step numbers), used on the shop page */
-.steps3--plain li::after{content:none}
-.steps3--plain h3{padding-right:0}
 
 /* ==========================================================================
    STUDIO PANEL, picture-card version
@@ -778,3 +775,20 @@ p:last-child{margin-bottom:0}
 #groups .ogroup + .ogroup{margin-top:3rem}
 @media (hover:hover){ .tier:hover .tier__img img{transform:scale(1.04)} }
 @media (max-width:1280px){ .choices--4{grid-template-columns:repeat(2,minmax(0,1fr))} }
+
+.ogroup.is-unused .choices{opacity:.35;pointer-events:none}
+.ogroup__unused{margin:0 0 1rem;font-size:.88rem;color:var(--gold-lt)}
+.ogroup__unused[hidden]{display:none}
+
+/* ---------- shop: product cards ---------- */
+.pcards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}
+.pcard{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line-soft)}
+.pcard__img{aspect-ratio:4/3;overflow:hidden;background:var(--ink)}
+.pcard__img img{width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease-out)}
+.pcard__body{display:grid;gap:.5rem;padding:clamp(20px,2vw,26px)}
+.pcard__tag{margin:0;font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold)}
+.pcard h3{font-size:clamp(1.3rem,1.6vw,1.5rem)}
+.pcard__body p:last-child{color:var(--muted);font-size:.93rem}
+@media (hover:hover){ .pcard:hover .pcard__img img{transform:scale(1.04)} }
+@media (max-width:1120px){ .pcards{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@media (max-width:620px){ .pcards{grid-template-columns:1fr} }

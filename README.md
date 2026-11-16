@@ -6,7 +6,7 @@ Static site for **UNICKS** (`@custombyunicks`). Plain HTML/CSS/JS, no build step
 index.html                  home: hero, the three services, why us, work, how it works, packages, survey form
 installations.html          service 1, price builder: 1 package, 2 extras, 3 book a survey
 design.html                 service 2, 3D designer: build the room, see the price, send the design
-shop.html                   service 3, shop (opening soon, no products yet)
+shop.html                   service 3, shop: floating seats and shelves, pedestal basins, brand fittings (to be stocked soon)
 packages.html               old address, forwards to installations.html (keeps shared links working)
 privacy.html                privacy notice (needed because the forms collect personal details)
 404.html                    page-not-found (uses root links, works on the real domain)
@@ -97,6 +97,28 @@ For whoever maintains it:
   fluted panel is cropped from one of the project photos. Each package and
   extra on the installations page names its picture with `img` in
   `packages-data.js`.
+
+## The shop (shop.html): plan for going live
+
+The page shows what is coming, marked "To be stocked soon": floating stone
+seats and shelves (straight, corner, rectangular) and round pedestal basins
+made in the workshop, plus taps, rails and lighting from supplier brands.
+Its pictures are crops of his own project photos and a render from the 3D
+designer (`assets/img/shop-*.webp`).
+
+GitHub Pages cannot take payments, so a real checkout needs a hosted store
+linked from this page or embedded in it (Shopify Buy Button, or Stripe
+Payment Links). Indicative UK costs, November 2026 (get quotes before
+committing):
+
+- **Shopify Basic:** about £19 a month billed yearly, £25 monthly; online card
+  payments about 2% + 25p.
+- **Klarna Pay in 3:** the shop pays, not the customer. Reported at roughly
+  5% to 6% plus 20p to 35p per order; Klarna does not publish a standard rate.
+  UK pay-later products became FCA regulated on 15 July 2026, and Klarna
+  handles the wording.
+- **PayPal:** a fixed 30p per commercial payment plus a percentage; check
+  PayPal's UK merchant fees page for the current rate and for Pay in 3.
 
 ## Connect the forms
 

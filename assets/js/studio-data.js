@@ -66,7 +66,8 @@ window.UNICKS_STUDIO = {
   basins: [
     { id: 'trough', name: 'Stone trough', note: 'Carved into the top', price: 0 },
     { id: 'vessel', name: 'Round bowl', note: 'Ceramic bowl on a stone top', price: 0 },
-    { id: 'double', name: 'Double trough', note: 'Two basins side by side', price: 1100, minW: 2.4 }
+    { id: 'double', name: 'Double trough', note: 'Two basins side by side', price: 1100, minW: 2.4 },
+    { id: 'pedestal', name: 'Round pedestal', note: 'Freestanding stone, made in our workshop', price: 1400 }
   ],
 
   mirrors: [

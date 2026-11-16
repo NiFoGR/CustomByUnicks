@@ -284,7 +284,8 @@ function init() {
     t += byId(D.layouts, state.layout).price;
     t += byId(D.stones, state.wall).wall + byId(D.stones, state.floor).floor;
     if (featOn()) t += D.feature.price;
-    SINGLES.forEach(([k, , list]) => { if (k !== 'wall' && k !== 'floor') t += byId(list, state[k]).price || 0; });
+    const ped = state.basin === 'pedestal';
+    SINGLES.forEach(([k, , list]) => { if (k !== 'wall' && k !== 'floor' && !(ped && (k === 'vanity' || k === 'front'))) t += byId(list, state[k]).price || 0; });
     D.lights.forEach((o) => { if (state.lights[o.id]) t += o.price; });
     D.extras.forEach((o) => { if (state.extras[o.id]) t += o.price; });
     return Math.round(t / 50) * 50;
@@ -300,7 +301,7 @@ function init() {
       'Shower walls: ' + (featOn() ? n(D.stones, state.feature) : 'Same as the walls'),
       'Floor: ' + n(D.stones, state.floor) + ', ' + n(D.floorPatterns, state.pattern).toLowerCase(),
       'Metal finish: ' + n(D.metals, state.metal),
-      'Vanity: ' + n(D.vanities, state.vanity) + ', ' + n(D.vanityFronts, state.front).toLowerCase(),
+      'Vanity: ' + (state.basin === 'pedestal' ? 'none (round pedestal basin)' : n(D.vanities, state.vanity) + ', ' + n(D.vanityFronts, state.front).toLowerCase()),
       'Basin: ' + n(D.basins, state.basin),
       'Mirror: ' + n(D.mirrors, state.mirror),
       'Glass screen: ' + n(D.screens, state.screen),
@@ -348,6 +349,15 @@ function init() {
     dblIn.closest('.choice').classList.toggle('is-off', !dOK);
     $('[data-note-of="double"]').textContent = dOK ? dbl.note : 'Needs a room ' + dbl.minW.toFixed(1) + ' m wide';
     $('[data-area]').textContent = (state.w * state.l).toFixed(1) + ' m²';
+    const ped = state.basin === 'pedestal';
+    ['vanity', 'front'].forEach((gid) => {
+      const g = $('[data-group="' + gid + '"]');
+      g.classList.toggle('is-unused', ped);
+      $$('input', g).forEach((i) => { i.disabled = ped; });
+      let n = $('.ogroup__unused', g);
+      if (!n) { n = document.createElement('p'); n.className = 'ogroup__unused'; n.textContent = 'Not needed with a round pedestal basin.'; g.querySelector('legend').after(n); }
+      n.hidden = !ped;
+    });
     $$('[data-same-stone]').forEach((img) => { img.src = OPT + 'stone-' + state.wall + '.webp'; });
     $$('[data-look]').forEach((btn) => {
       const lk = byId(D.looks, btn.dataset.look);
