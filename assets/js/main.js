@@ -115,7 +115,8 @@ var CONTACT_EMAIL = '';
 
   /* ---------- Package cards ---------- */
   var tierHTML = function (p, i, action) {
-    return '<span class="tier__tag">Package ' + String.fromCharCode(65 + i) + '</span>' +
+    return (p.img ? '<div class="tier__img"><img src="' + p.img + '" alt="" width="640" height="480" loading="lazy" decoding="async"></div>' : '') +
+      '<span class="tier__tag">Package ' + String.fromCharCode(65 + i) + '</span>' +
       (p.featured ? '<span class="tier__flag">Recommended</span>' : '') +
       '<h3>' + esc(p.name) + '</h3>' +
       '<p class="tier__sum">' + esc(p.summary) + '</p>' +
@@ -165,19 +166,22 @@ var CONTACT_EMAIL = '';
     }).join('');
 
     $('#groups').innerHTML = DATA.groups.map(function (g) {
-      return '<fieldset class="ogroup"><legend>' + esc(g.title) + '</legend><div class="opts">' +
+      return '<fieldset class="ogroup"><legend>' + esc(g.title) + '</legend>' +
+        '<p class="ogroup__help">' + (g.type === 'single' ? 'Pick one.' : 'Tick any you want. Anything your package already has is ticked for you.') + '</p>' +
+        '<div class="choices choices--4">' +
         g.options.map(function (o) {
           var type = g.type === 'single' ? 'radio' : 'checkbox';
-          return '<label class="opt" data-type="' + g.type + '" data-opt="' + o.id + '">' +
+          return '<label class="choice" data-type="' + g.type + '" data-opt="' + o.id + '">' +
             '<input type="' + type + '" name="' + (g.type === 'single' ? g.id : o.id) + '" value="' + o.id + '">' +
-            '<span class="opt__box">' + TICK + '</span>' +
-            '<span><span class="opt__name">' + esc(o.name) + '</span><span class="opt__note">' + esc(o.note) + '</span></span>' +
-            '<span class="opt__price"></span></label>';
+            (o.img ? '<span class="choice__img"><img src="' + o.img + '" alt="" width="640" height="480" loading="lazy" decoding="async"></span>' : '') +
+            '<span class="choice__mark' + (type === 'radio' ? ' is-round' : '') + '" aria-hidden="true">' + TICK + '</span>' +
+            '<span class="choice__body"><span class="choice__name">' + esc(o.name) + '</span><span class="choice__note">' + esc(o.note) + '</span>' +
+            '<span class="choice__price"></span></span></label>';
         }).join('') + '</div></fieldset>';
     }).join('');
 
     var optEls = {};
-    $$('.opt').forEach(function (el) { optEls[el.dataset.opt] = el; });
+    $$('#groups .choice').forEach(function (el) { optEls[el.dataset.opt] = el; });
     $$('[data-sum-note]').forEach(function (el) { el.textContent = DATA.note; });
 
     // the total counts up or down to its new value instead of jumping
@@ -233,7 +237,7 @@ var CONTACT_EMAIL = '';
           var el = optEls[o.id], input = $('input', el), p = priceOf(o);
           el.hidden = p === null;
           if (p === null) { input.checked = false; return; }
-          var incl = p === 0, on, price = $('.opt__price', el);
+          var incl = p === 0, on, price = $('.choice__price', el);
           price.textContent = incl ? 'Included' : '+' + money(p);
           price.classList.toggle('is-zero', incl);
           if (g.type === 'single') {

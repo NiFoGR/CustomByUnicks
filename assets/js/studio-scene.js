@@ -3,10 +3,8 @@
    --------------------------------------------------------------------------
    The room is built from code, part by part (walls, floor, vanity, mirror,
    shower screen...). Each part knows which choices it depends on, so when
-   one choice changes only the parts it touches are rebuilt, and they are
-   animated in as if being fitted: slabs rise, the floor is laid tile by
-   tile, fittings extrude out of a gold outline, LED lines draw on, and new
-   stone pours up the walls behind a lit edge.
+   one choice changes only the parts it touches are rebuilt, instantly.
+   Finishes cross-fade quickly; nothing else animates except the camera.
 
    Units are metres. x runs across the room (width W), z runs back to front
    (length L), y is up. The back wall sits at z = -L/2.
@@ -44,7 +42,7 @@ const STONE_TINT = { black: 0x2b2b2c, brown: 0x4b3d33, cream: 0xd8cbb4, traverti
 const METALS = {
   brass:  { color: 0xd2a865, metalness: 1, roughness: 0.32 },
   black:  { color: 0x1a1a1a, metalness: 0.55, roughness: 0.5 },
-  gun:    { color: 0x55575b, metalness: 1, roughness: 0.3 },
+  gun:    { color: 0x74767a, metalness: 1, roughness: 0.3 },
   nickel: { color: 0xcfcdc8, metalness: 1, roughness: 0.24 }
 };
 
@@ -194,30 +192,21 @@ function mirrorShape(kind, w, h) {
   return s;
 }
 
-/* new stone pours across a surface behind a lit edge (a small addition to the standard material) */
-function sweepable(mat, axis) {
-  const u = { uMapB: { value: null }, uT: { value: 2 }, uOn: { value: 0 }, uGlow: { value: new THREE.Color(0, 0, 0) }, uStart: { value: 0 }, uLen: { value: 1 } };
+/* a quick cross-fade from one stone or wood to the next (a small addition to the standard material) */
+function sweepable(mat) {
+  const u = { uMapB: { value: null }, uT: { value: 0 }, uOn: { value: 0 } };
   mat.userData.sw = u;
   mat.onBeforeCompile = (sh) => {
     Object.assign(sh.uniforms, u);
-    sh.vertexShader = 'varying vec3 vSwP;\n' + sh.vertexShader.replace('#include <project_vertex>', '#include <project_vertex>\n\tvSwP = ( modelMatrix * vec4( transformed, 1.0 ) ).xyz;');
-    sh.fragmentShader = 'varying vec3 vSwP;\nuniform sampler2D uMapB;\nuniform float uT, uOn, uStart, uLen;\nuniform vec3 uGlow;\n' + sh.fragmentShader
-      .replace('#include <map_fragment>', [
-        'float swBand = 0.0;',
-        '#ifdef USE_MAP',
-        '\tvec4 sampledDiffuseColor = texture2D( map, vMapUv );',
-        '\tif ( uOn > 0.5 ) {',
-        '\t\tfloat h = ( vSwP.' + axis + ' - uStart ) / uLen;',
-        '\t\th += ( fract( sin( dot( floor( vSwP.xz * 11.0 ) + floor( vSwP.y * 11.0 ), vec2( 12.9898, 78.233 ) ) ) * 43758.5453 ) - 0.5 ) * 0.012;',
-        '\t\tsampledDiffuseColor = mix( texture2D( uMapB, vMapUv ), sampledDiffuseColor, smoothstep( uT - 0.012, uT + 0.012, h ) );',
-        '\t\tswBand = 1.0 - smoothstep( 0.0, 0.028, abs( h - uT ) );',
-        '\t}',
-        '\tdiffuseColor *= sampledDiffuseColor;',
-        '#endif'
-      ].join('\n'))
-      .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n\ttotalEmissiveRadiance += uGlow * swBand;');
+    sh.fragmentShader = 'uniform sampler2D uMapB;\nuniform float uT, uOn;\n' + sh.fragmentShader.replace('#include <map_fragment>', [
+      '#ifdef USE_MAP',
+      '\tvec4 sampledDiffuseColor = texture2D( map, vMapUv );',
+      '\tif ( uOn > 0.5 ) sampledDiffuseColor = mix( sampledDiffuseColor, texture2D( uMapB, vMapUv ), uT );',
+      '\tdiffuseColor *= sampledDiffuseColor;',
+      '#endif'
+    ].join('\n'));
   };
-  mat.customProgramCacheKey = () => 'sweep-' + axis;
+  mat.customProgramCacheKey = () => 'xfade';
   return mat;
 }
 
@@ -277,10 +266,10 @@ export function createStudio(host, opt) {
   /* ---------- materials ---------- */
   const S = shapes();
   const M = {
-    wall: sweepable(new THREE.MeshStandardMaterial({ roughness: 0.2 }), 'y'),
-    feature: sweepable(new THREE.MeshStandardMaterial({ roughness: 0.2 }), 'y'),
-    floor: sweepable(new THREE.MeshStandardMaterial({ roughness: 0.26 }), 'z'),
-    wood: sweepable(new THREE.MeshStandardMaterial({ roughness: 0.55 }), 'y'),
+    wall: sweepable(new THREE.MeshStandardMaterial({ roughness: 0.2 })),
+    feature: sweepable(new THREE.MeshStandardMaterial({ roughness: 0.2 })),
+    floor: sweepable(new THREE.MeshStandardMaterial({ roughness: 0.26 })),
+    wood: sweepable(new THREE.MeshStandardMaterial({ roughness: 0.55 })),
     metal: new THREE.MeshStandardMaterial(),
     ceramic: new THREE.MeshPhysicalMaterial({ color: 0xf2efe9, roughness: 0.14, clearcoat: 0.7, clearcoatRoughness: 0.12 }),
     ceramic2: new THREE.MeshPhysicalMaterial({ color: 0xf2efe9, roughness: 0.14, clearcoat: 0.7, clearcoatRoughness: 0.12, side: THREE.DoubleSide }),
@@ -289,7 +278,7 @@ export function createStudio(host, opt) {
     reeded: new THREE.MeshPhysicalMaterial({ color: 0xf1f4f2, roughness: 0.2, transparent: true, opacity: 0.42, side: THREE.DoubleSide, depthWrite: false, normalMap: S.reeds, normalScale: new THREE.Vector2(1.4, 1.4) }),
     shelf: new THREE.MeshPhysicalMaterial({ color: 0xeef4f2, roughness: 0.05, transparent: true, opacity: 0.25, depthWrite: false }),
     shell: new THREE.MeshStandardMaterial({ color: 0x17140f, roughness: 0.9 }),
-    plaster: new THREE.MeshStandardMaterial({ color: 0xe4ded4, roughness: 0.95 }),
+    plaster: new THREE.MeshStandardMaterial({ color: 0xe4ded4, roughness: 0.95, emissive: 0x221d17 }),
     door: new THREE.MeshStandardMaterial({ color: 0x24201c, roughness: 0.55 }),
     groove: new THREE.MeshStandardMaterial({ color: 0x080706, roughness: 1 }),
     mirrorBack: new THREE.MeshStandardMaterial({ color: 0x0c0c0c, roughness: 0.2, metalness: 0.4 }),
@@ -313,7 +302,6 @@ export function createStudio(host, opt) {
   };
   const aoMat = (shape, o) => new THREE.MeshBasicMaterial({ color: 0x000000, alphaMap: shape, transparent: true, opacity: o, depthWrite: false });
   const AO = { down: aoMat(S.down, 0.5), round: aoMat(S.round, 0.55) };
-  const wire = new THREE.LineBasicMaterial({ color: GOLD.clone().multiplyScalar(1.6), transparent: true, opacity: 0, depthWrite: false });
 
   /* ---------- textures, loaded only when a finish is picked ---------- */
   const loader = new THREE.TextureLoader();
@@ -335,7 +323,7 @@ export function createStudio(host, opt) {
   }
 
   /* ---------- light ---------- */
-  const hemi = new THREE.HemisphereLight(0xfff0dd, 0x3a2e24, 0.5);
+  const hemi = new THREE.HemisphereLight(0xfff0dd, 0x9a8670, 0.5);
   scene.add(hemi);
   const pedestal = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), M.pedestal);
   pedestal.rotation.x = -Math.PI / 2; pedestal.position.y = -0.121;
@@ -437,7 +425,7 @@ export function createStudio(host, opt) {
     m.position.set(x, y, z);
     if (rx) m.rotation.x = rx;
     if (ry) m.rotation.y = ry;
-    m.renderOrder = 2;
+    m.renderOrder = glows.has(mat) ? 3 : 1;
     m.userData.noPick = true;
     parent.add(m);
     return m;
@@ -453,95 +441,19 @@ export function createStudio(host, opt) {
     g.userData.part = key;
     if (o.pick) g.userData.pick = o.pick;
     make(g);
-    if (o.kind === 'fit' || o.kind === 'light') pivot(g, 'bottom');
-    if (o.kind === 'inlay') pivot(g, 'centre');
     room.add(g);
-    const p = { key, g, sig: s, wall: o.wall || null, kind: o.kind || 'fit', hidden: !introDone, born: performance.now() };
-    if (p.kind === 'wall') { p.full = g.children[0]; p.stub = g.children[1]; p.len = o.len; }
+    const p = { key, g, sig: s, wall: o.wall || null, kind: o.kind || 'fit' };
+    if (p.kind === 'wall') { p.full = g.children[0]; p.stub = g.children[1]; }
     parts.set(key, p);
     if (old) retire(old);
-    if (introDone) buildIn(p, old ? 140 : 0);
-    else g.visible = false;
+    dirty = true;
     return p;
   }
-  // move a group's origin to the bottom (or centre) of what it holds, so it can grow from there
-  function pivot(g, where) {
-    g.updateMatrixWorld(true);
-    const b = new THREE.Box3().setFromObject(g);
-    if (b.isEmpty()) return;
-    const c = b.getCenter(new THREE.Vector3());
-    if (where === 'bottom') c.y = b.min.y;
-    g.children.forEach((ch) => ch.position.sub(c));
-    g.position.copy(c);
-  }
-  function glowsIn(g) { const out = []; g.traverse((o) => { if (o.material && glows.has(o.material)) out.push(o.material); }); return out; }
-
-  // how each kind of part arrives
-  function buildIn(p, delay) {
-    const g = p.g;
-    // nothing shows before its turn
-    if (delay > 0 && !reduced) { p.hidden = true; anim(1, () => {}, delay - 1, () => { p.hidden = false; dirty = true; }); }
-    else p.hidden = false;
-    dirty = true;
-    if (p.kind === 'wall') {
-      const len = p.len || 1;
-      p.full.children.forEach((ch) => {
-        if (ch.userData.rise) {
-          ch.scale.y = 0.001;
-          anim(650, (k) => { ch.scale.y = Math.max(0.001, easeOut(k)); }, delay + (ch.userData.s / len) * 420);
-        } else if (ch.userData.late) {
-          ch.visible = false;
-          anim(1, () => {}, delay + 900, () => { ch.visible = true; });
-        }
-      });
-    } else if (p.kind === 'tiles') {
-      const tiles = g.children.filter((c) => c.userData.tile), step = Math.min(70, 900 / Math.max(1, tiles.length));
-      tiles.forEach((t) => {
-        t.scale.set(0.001, 1, 0.001);
-        anim(520, (k) => { const e = Math.max(0.001, easeOut(k)); t.scale.set(e, 1, e); }, delay + t.userData.order * step);
-      });
-      g.children.filter((c) => c.userData.late).forEach((c) => { c.visible = false; anim(1, () => {}, delay + tiles.length * step + 400, () => { c.visible = true; }); });
-    } else if (p.kind === 'inlay') {
-      g.scale.set(0.001, 1, 0.001);
-      anim(900, (k) => { const e = Math.max(0.001, easeOut(k)); g.scale.set(e, 1, e); g.rotation.y = (1 - e) * -1.2; }, delay);
-    } else if (p.kind === 'fit') {
-      outline(g, delay);
-      g.scale.y = 0.001;
-      anim(700, (k) => { g.scale.y = Math.max(0.001, easeOut(k)); }, delay + 220);
-    }
-    if (p.kind === 'fit' || p.kind === 'light') {
-      // LED lines draw on, their light fades up
-      const st0 = delay + (p.kind === 'fit' ? 700 : 0);
-      g.traverse((o) => {
-        if (o.userData.strip) { o.scale.x = 0.001; anim(600, (k) => { o.scale.x = Math.max(0.001, easeInOut(k)); }, st0); }
-      });
-      glowsIn(g).forEach((m) => { m.userData.fade = 0; paintGlow(m); anim(800, (k) => { m.userData.fade = easeInOut(k); paintGlow(m); }, st0 + 250); });
-    }
-    envAfter = true;
-  }
-  // a gold outline of the part's box shows first, like a drawing, and fades as the part fills it
-  function outline(g, delay) {
-    if (reduced) return;
-    g.updateMatrixWorld(true);
-    const b = new THREE.Box3().setFromObject(g);
-    if (b.isEmpty()) return;
-    const size = b.getSize(new THREE.Vector3()), c = b.getCenter(new THREE.Vector3());
-    const m = wire.clone();
-    const l = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(size.x + 0.01, size.y + 0.01, size.z + 0.01)), m);
-    l.position.copy(c);
-    l.userData.noPick = true;
-    scene.add(l);
-    anim(1300, (k) => { m.opacity = k < 0.15 ? k / 0.15 * 0.9 : k < 0.55 ? 0.9 : 0.9 * (1 - (k - 0.55) / 0.45); }, delay, () => { scene.remove(l); l.geometry.dispose(); m.dispose(); });
-  }
   function retire(p) {
-    if (parts.get(p.key) === p) parts.delete(p.key);      // a replacement may already hold this key
-    const done = () => { room.remove(p.g); disposeTree(p.g); };
-    // no exit animation for things replaced almost as soon as they appeared (someone stepping through sizes quickly)
-    if (!introDone || p.kind === 'tiles' || p.kind === 'static' || reduced || performance.now() - p.born < 700) { done(); return; }
-    const g = p.g;
-    if (p.kind === 'wall') { anim(320, (k) => { g.scale.y = Math.max(0.001, 1 - easeInOut(k)); }, 0, done); return; }
-    if (p.kind === 'inlay') { anim(320, (k) => { const e = Math.max(0.001, 1 - easeInOut(k)); g.scale.set(e, 1, e); }, 0, done); return; }
-    anim(300, (k) => { g.scale.y = Math.max(0.001, 1 - easeInOut(k)); glowsIn(g).forEach((m) => { m.userData.fade = 1 - k; paintGlow(m); }); }, 0, done);
+    if (parts.get(p.key) === p) parts.delete(p.key);
+    room.remove(p.g);
+    disposeTree(p.g);
+    dirty = true;
   }
   function disposeTree(g) {
     g.traverse((o) => {
@@ -555,44 +467,45 @@ export function createStudio(host, opt) {
   /* ---------- walls ---------- */
   function wallPart(key, holes, featureSpan) {
     const wd = WD[key];
-    return part('wall:' + key, [wd.len, wd.o.toArray(), holes, featureSpan], { kind: 'wall', len: wd.len }, (g) => {
+    return part('wall:' + key, [wd.len, wd.o.toArray(), holes, featureSpan], { kind: 'wall' }, (g) => {
       const full = new THREE.Group(), stub = new THREE.Group();
       g.add(full, stub);
       const ry = Math.atan2(wd.n.x, wd.n.z), r = rng(key.length * 97 + Math.round(wd.len * 10));
       // stone slabs, evenly divided; the shower's walls are their own run so joints line up with the glass
       const runs = featureSpan ? [[0, featureSpan[0], false], [featureSpan[0], featureSpan[1], true], [featureSpan[1], wd.len, false]] : [[0, wd.len, false]];
+      const qWall = new Quads(), qFeat = new Quads();
       let idx = 0;
       runs.forEach(([a, b, feat]) => {
         if (b - a < 0.01) return;
-        const n = Math.max(1, Math.round((b - a) / 1.2)), sw = (b - a) / n, f = sw / TEX;
+        const n = Math.max(1, Math.round((b - a) / 1.2)), sw = (b - a) / n, f = sw / TEX, q = feat ? qFeat : qWall;
         for (let i = 0; i < n; i++, idx++) {
           const s0 = a + i * sw, flip = idx % 2 === 1;                    // neighbours mirrored, like book-matched marble
           const off = fract(key.length * 0.137 + (idx >> 1) * 0.381 + r() * 0.05) * (1 - f);
           const uvAt = (s, y) => { let t = (s - s0) / sw; if (flip) t = 1 - t; return [off + t * f, y / TEX]; };
-          const q = new Quads();
           cut({ s0: s0 + (s0 > 0.001 ? GAP / 2 : 0), s1: s0 + sw - (s0 + sw < wd.len - 0.001 ? GAP / 2 : 0), y0: 0, y1: H }, holes).forEach((c) => {
             const p0 = uvAt(c.s0, c.y0), p1 = uvAt(c.s1, c.y1);
             q.add(at(wd, c.s0, c.y0, SLAB), wd.u, UP, wd.n, c.s1 - c.s0, c.y1 - c.y0, [p0[0], p0[1], p1[0], p1[1]]);
           });
-          const m = new THREE.Mesh(q.geometry(), feat ? M.feature : M.wall);
-          m.receiveShadow = true;
-          m.userData.rise = true; m.userData.s = s0 + sw / 2;
-          m.userData.pick = feat ? 'feature' : 'wall';
-          full.add(m);
         }
       });
-      // the wall itself, dark, seen at the joints and where the model is cut
-      cut({ s0: -T, s1: wd.len + T, y0: 0, y1: H }, holes).forEach((c) => {
-        const geo = new THREE.BoxGeometry(c.s1 - c.s0, c.y1 - c.y0, T);
-        geo.translate(0, (c.y1 - c.y0) / 2, 0);
-        const m = mesh(geo, M.shell, full, 0, 0, 0, false);
+      [[qWall, M.wall, 'wall'], [qFeat, M.feature, 'feature']].forEach(([q, mat, tag]) => {
+        if (!q.i.length) return;
+        const m = new THREE.Mesh(q.geometry(), mat);
+        m.receiveShadow = true; m.userData.pick = tag;
+        full.add(m);
+      });
+      // the wall core, dark, seen at the joints and where the model is cut. Around a niche it stands back by a few
+      // millimetres, so its faces never share a plane with the niche lining (that is what made niches flicker)
+      const coreHoles = holes.map((h) => (h.depth ? { s0: h.s0 - 0.004, s1: h.s1 + 0.004, y0: h.y0 - 0.004, y1: h.y1 + 0.004 } : h));
+      cut({ s0: -T, s1: wd.len + T, y0: 0, y1: H }, coreHoles).forEach((c) => {
+        const m = box(c.s1 - c.s0, c.y1 - c.y0, T, M.shell, full, 0, 0, 0, false);
         m.receiveShadow = true;
-        m.position.copy(at(wd, (c.s0 + c.s1) / 2, c.y0, -T / 2 - 0.001)); m.rotation.y = ry;
-        m.userData.rise = true; m.userData.s = clamp((c.s0 + c.s1) / 2, 0, wd.len); m.userData.pick = 'wall';
+        m.position.copy(at(wd, (c.s0 + c.s1) / 2, (c.y0 + c.y1) / 2, -T / 2 - 0.001)); m.rotation.y = ry;
+        m.userData.pick = 'wall';
       });
       // fine gold line on top of the cut wall
       const line = box(wd.len + 2 * T, 0.006, 0.006, M.hair, full, 0, 0, 0, false);
-      line.position.copy(at(wd, wd.len / 2, H + 0.003, -0.005)); line.rotation.y = ry; line.userData.late = true; line.userData.noPick = true;
+      line.position.copy(at(wd, wd.len / 2, H + 0.003, -0.005)); line.rotation.y = ry; line.userData.noPick = true;
       // niches
       holes.filter((h) => h.depth).forEach((h) => {
         const d = h.depth, w = h.s1 - h.s0, hh = h.y1 - h.y0, nq = new Quads(), m = wd.n.clone().negate();
@@ -602,21 +515,20 @@ export function createStudio(host, opt) {
         nq.add(at(wd, h.s0, h.y0, SLAB), m, UP, wd.u, d + SLAB, hh, [0, 0, d / TEX, hh / TEX]);
         nq.add(at(wd, h.s1, h.y0, -d), wd.n, UP, wd.u.clone().negate(), d + SLAB, hh, [0, 0, d / TEX, hh / TEX]);
         const nm = new THREE.Mesh(nq.geometry(), h.feature ? M.feature : M.wall);
-        nm.receiveShadow = true; nm.userData.late = true; nm.userData.pick = h.feature ? 'feature' : 'wall';
+        nm.receiveShadow = true; nm.userData.pick = h.feature ? 'feature' : 'wall';
         full.add(nm);
-        const plug = box(w, hh, T - d, M.shell, full, 0, 0, 0, false);
-        plug.position.copy(at(wd, (h.s0 + h.s1) / 2, (h.y0 + h.y1) / 2, -d - (T - d) / 2 - 0.001)); plug.rotation.y = ry; plug.userData.late = true;
+        // closes the wall behind the niche, wider than the opening and a few millimetres behind its back face
+        const plug = box(w + 0.02, hh + 0.02, T - d - 0.004, M.shell, full, 0, 0, 0, false);
+        plug.position.copy(at(wd, (h.s0 + h.s1) / 2, (h.y0 + h.y1) / 2, -d - 0.004 - (T - d - 0.004) / 2 - 0.001)); plug.rotation.y = ry;
       });
       // soft shade in the corners and along the floor
       [0, wd.len].forEach((s, i) => {
         const cg = onWall(wd, s, 0, full);
         const p = plane(H, 0.22, AO.down, cg, (i ? -1 : 1) * 0.11, H / 2, DECAL);
         p.rotation.z = (i ? -1 : 1) * Math.PI / 2;
-        cg.userData.late = true;
       });
       const bg = onWall(wd, wd.len / 2, 0, full);
       plane(wd.len, 0.25, AO.down, bg, 0, 0.125, DECAL).rotation.z = Math.PI;
-      bg.userData.late = true;
       // low stub shown when the wall is cut away
       const sb = box(wd.len + 2 * T, 0.07, T, M.shell, stub, 0, 0, 0, false);
       sb.position.copy(at(wd, wd.len / 2, 0.035, -T / 2 - 0.001)); sb.rotation.y = ry;
@@ -629,12 +541,12 @@ export function createStudio(host, opt) {
   /* ---------- floor ---------- */
   function floorPart() {
     const { W, L } = P, pat = st.pattern || 'large';
-    const p = part('floor', [W, L, pat], { kind: 'tiles', pick: 'floor' }, (g) => {
+    const p = part('floor', [W, L, pat], { kind: 'static', pick: 'floor' }, (g) => {
       const r = rng(7 + Math.round(W * 10) * 31 + Math.round(L * 10));
       const tw = pat === 'square' ? 0.9 : 1.2, td = pat === 'square' ? 0.9 : 0.6, fu = tw / TEX, fv = td / TEX;
       const nz = Math.ceil(L / td) + 1, nx = Math.ceil(W / tw) + 2;
       const z0 = -Math.ceil(L / td) * td / 2;
-      let order = 0;
+      const q = new Quads();
       for (let iz = 0; iz < nz; iz++) {
         const shift = pat === 'brick' && iz % 2 ? tw / 2 : 0;
         const x0 = -Math.ceil(W / tw) * tw / 2 - shift;
@@ -647,19 +559,17 @@ export function createStudio(host, opt) {
           const U = (x) => ou + ((x - ax) / tw) * fu, Vv = (z) => ov + ((z - az) / td) * fv;
           let uv = [U(cx0), Vv(cz1), U(cx1), Vv(cz0)];
           if (rot) uv = [uv[2], uv[3], uv[0], uv[1]];
-          const cx = (cx0 + cx1) / 2, cz = (cz0 + cz1) / 2, q = new Quads();
-          q.add(V(cx0 - cx, 0, cz1 - cz), V(1, 0, 0), V(0, 0, -1), UP, cx1 - cx0, cz1 - cz0, uv);
-          const m = new THREE.Mesh(q.geometry(), M.floor);
-          m.position.set(cx, 0, cz); m.receiveShadow = true;
-          m.userData.tile = true; m.userData.order = order++;
-          g.add(m);
+          q.add(V(cx0, 0, cz1), V(1, 0, 0), V(0, 0, -1), UP, cx1 - cx0, cz1 - cz0, uv);
         }
       }
+      const tiles = new THREE.Mesh(q.geometry(), M.floor);
+      tiles.receiveShadow = true;
+      g.add(tiles);
       // dark bed under the tiles, seen in the joints
       const bed = box(W + 2 * T, 0.12, L + 2 * T, M.shell, g, 0, -0.063, 0, false);
       bed.receiveShadow = true;
       // soft shade along the walls
-      const aoF = (w, x, z, ry) => { const m = plane(w, 0.32, AO.down, g, x, DECAL, z, -Math.PI / 2); m.rotation.order = 'YXZ'; m.rotation.y = ry; m.userData.late = true; };
+      const aoF = (w, x, z, ry) => { const m = plane(w, 0.32, AO.down, g, x, DECAL, z, -Math.PI / 2); m.rotation.order = 'YXZ'; m.rotation.y = ry; };
       aoF(W, 0, -L / 2 + 0.16, 0); aoF(W, 0, L / 2 - 0.16, Math.PI); aoF(L, -W / 2 + 0.16, 0, Math.PI / 2); aoF(L, W / 2 - 0.16, 0, -Math.PI / 2);
     });
     return p;
@@ -815,7 +725,7 @@ export function createStudio(host, opt) {
     part('screen', [sw, sd, xs, L, scr], { kind: 'fit', pick: 'screen' }, (g) => {
       const gl = sd - 0.02;
       const glass = box(0.008, 2.0, gl, scr === 'fluted' ? M.reeded : M.glass, g, xs, 1.0, z0 + gl / 2, false);
-      glass.renderOrder = 3;
+      glass.renderOrder = 4;
       if (scr === 'fluted') { const t = S.reeds.clone(); t.needsUpdate = true; t.repeat.set(gl / 0.018, 1); glass.material = M.reeded.clone(); glass.material.normalMap = t; glass.material.userData.own = true; }
       box(0.022, 2.0, 0.022, M.metal, g, xs, 1.0, z0 + 0.011);                      // wall channel
       if (scr === 'frameless') {
@@ -928,7 +838,7 @@ export function createStudio(host, opt) {
       geo.scale(ba, 1, bb);
       mesh(geo, M.ceramic2, g, bx, 0, bz);
       const water = new THREE.Mesh(new THREE.CircleGeometry(1, 64), M.water);
-      water.rotation.x = -Math.PI / 2; water.scale.set(ba * 0.905, bb * 0.905, 1); water.position.set(bx, 0.46, bz); water.userData.noPick = true;
+      water.rotation.x = -Math.PI / 2; water.scale.set(ba * 0.905, bb * 0.905, 1); water.position.set(bx, 0.46, bz); water.userData.noPick = true; water.renderOrder = 4;
       g.add(water);
       plane(ba * 2.6, bb * 2.4, AO.round, g, bx, DECAL, bz, -Math.PI / 2);
       const fx = bx - ba - 0.14, fz = bz + bb * 0.35;
@@ -959,6 +869,8 @@ export function createStudio(host, opt) {
         const i = 0.04;
         strip(W - 2 * i, 0.006, 0.006, g, 0, H - 0.03, -L / 2 + i); strip(W - 2 * i, 0.006, 0.006, g, 0, H - 0.03, L / 2 - i);
         strip(0.006, 0.006, L - 2 * i, g, -W / 2 + i, H - 0.03, 0); strip(0.006, 0.006, L - 2 * i, g, W / 2 - i, H - 0.03, 0);
+        const spill = (w, x, z, ry) => { const m = plane(w, 0.45, glowMat(S.down, 0.45), g, x, H - DECAL, z, Math.PI / 2); m.rotation.order = 'YXZ'; m.rotation.y = ry; };
+        spill(W, 0, -L / 2 + 0.225, Math.PI); spill(W, 0, L / 2 - 0.225, 0); spill(L, -W / 2 + 0.225, 0, -Math.PI / 2); spill(L, W / 2 - 0.225, 0, Math.PI / 2);
       }
     });
     if (lit.cove) Object.keys(WD).forEach((k) => {
@@ -1073,16 +985,9 @@ export function createStudio(host, opt) {
       if (!mat.map || reduced || !introDone) {
         mat.map = t; mat.color.set(0xffffff); mat.needsUpdate = true; u.uOn.value = 0; return;
       }
-      if (u.uOn.value > 0.5 && u.uMapB.value) mat.map = u.uMapB.value;     // finish any pour still running
-      u.uMapB.value = t; u.uOn.value = 1; u.uT.value = -0.05;
-      if (mat === M.floor) { u.uStart.value = -P.L / 2; u.uLen.value = P.L; }
-      else if (mat === M.wood) { u.uStart.value = 0.36; u.uLen.value = 0.6; }
-      else { u.uStart.value = 0; u.uLen.value = H; }
-      const glow = new THREE.Color(1, 0.72, 0.38);
-      anim(1500, (k) => {
-        u.uT.value = -0.05 + 1.12 * easeInOut(k);
-        u.uGlow.value.copy(glow).multiplyScalar(2.4 * Math.sin(Math.PI * k));
-      }, 0, () => { mat.map = t; u.uOn.value = 0; u.uGlow.value.set(0, 0, 0); dirty = true; });
+      if (u.uOn.value > 0.5 && u.uMapB.value) mat.map = u.uMapB.value;     // finish any fade still running
+      u.uMapB.value = t; u.uOn.value = 1; u.uT.value = 0;
+      anim(260, (k) => { u.uT.value = k; }, 0, () => { mat.map = t; u.uOn.value = 0; dirty = true; });
       envAfter = true;
     });
   }
@@ -1098,7 +1003,7 @@ export function createStudio(host, opt) {
       [M.metal, M.inlayMetal].forEach((mat) => { mat.color.copy(from.c).lerp(to.c, k); mat.roughness = from.r + (to.r - from.r) * k; mat.metalness = from.me + (to.me - from.me) * k; });
       dirty = true;
     };
-    if (first || !introDone) apply(1); else { anim(700, (k) => apply(easeInOut(k))); envAfter = true; }
+    if (first || !introDone) apply(1); else { anim(260, (k) => apply(easeOut(k))); envAfter = true; }
   }
   function finishes() {
     setMetal(st.metal);
@@ -1109,7 +1014,7 @@ export function createStudio(host, opt) {
     if (cool !== LIGHT.cool) {
       const from = LIGHT.cool;
       if (!introDone) { LIGHT.cool = cool; applyLight(); }
-      else { anim(700, (k) => { LIGHT.cool = from + (cool - from) * easeInOut(k); applyLight(); }); envAfter = true; }
+      else { anim(260, (k) => { LIGHT.cool = from + (cool - from) * easeOut(k); applyLight(); }); envAfter = true; }
     }
     return Promise.all([
       setStone(M.wall, st.wall, STONE_TINT[st.wall] || 0x777777),
@@ -1154,7 +1059,6 @@ export function createStudio(host, opt) {
     Object.keys(dist).forEach((k) => { hide[k] = dist[k] < m; });
     isInside = !hide.back && !hide.front && !hide.left && !hide.right && c.y < H - 0.12 && c.y > 0.05;
     parts.forEach((p) => {
-      if (p.hidden) { p.g.visible = false; return; }
       if (p.kind === 'wall') { const k = p.key.slice(5); p.g.visible = true; p.full.visible = !hide[k]; p.stub.visible = hide[k]; return; }
       if (p.key === 'ceiling') { p.g.visible = isInside; return; }
       if (p.key === 'dims') { p.g.visible = !isInside; return; }
@@ -1169,7 +1073,7 @@ export function createStudio(host, opt) {
     [['w', P.W], ['l', P.L]].forEach(([k, val]) => {
       const el = lab[k];
       if (!el) return;
-      if (isInside || !d || d.hidden) { el.hidden = true; return; }
+      if (isInside || !d) { el.hidden = true; return; }
       proj.copy(d.g.userData[k]).project(camera);
       const ok = proj.z < 1 && Math.abs(proj.x) < 1.05 && Math.abs(proj.y) < 1.05;
       el.hidden = !ok;
@@ -1236,7 +1140,7 @@ export function createStudio(host, opt) {
     const { W, L, xv, sw, sd, bath, bx, bz } = P, a = camera.aspect;
     const rad = Math.sqrt(W * W + L * L + H * H) / 2;
     const vf = THREE.MathUtils.degToRad(34), hf = 2 * Math.atan(Math.tan(vf / 2) * a);
-    const fit = rad / Math.sin(Math.min(vf, hf) / 2);
+    const fit = rad / Math.sin(Math.min(vf, hf) / 2) * 0.93;   // the room fills the view; the cut-away corner may crop a little
     const dir = V(0.58, 0.72, 1).normalize();
     const pf = THREE.MathUtils.degToRad(30), phf = 2 * Math.atan(Math.tan(pf / 2) * a);
     const planD = Math.max((W / 2 + 0.7) / Math.tan(phf / 2), (L / 2 + 0.7) / Math.tan(pf / 2)) + H;
@@ -1258,10 +1162,10 @@ export function createStudio(host, opt) {
       camera.position.copy(v.p); controls.target.copy(v.t); camera.fov = v.f; camera.updateProjectionMatrix();
       tween = null; controls.update(); dirty = true; return;
     }
-    tween = { p0: camera.position.clone(), t0: controls.target.clone(), f0: camera.fov, v, s: performance.now(), ms: ms || 1100 };
+    tween = { p0: camera.position.clone(), t0: controls.target.clone(), f0: camera.fov, v, s: performance.now(), ms: ms || 650 };
   }
   function stepTween(now) {
-    const k = Math.min(1, (now - tween.s) / tween.ms), e = easeInOut(k);
+    const k = Math.min(1, (now - tween.s) / tween.ms), e = easeOut(k);
     camera.position.lerpVectors(tween.p0, tween.v.p, e);
     controls.target.lerpVectors(tween.t0, tween.v.t, e);
     camera.fov = tween.f0 + (tween.v.f - tween.f0) * e;
@@ -1290,6 +1194,8 @@ export function createStudio(host, opt) {
     if (!active || !built) return;
     if (anims.size) { stepAnims(now); dirty = true; }
     if (tween) stepTween(now);
+    // inside the room you can look up at the ceiling and the rain shower; from outside the camera stays above the floor
+    controls.maxPolarAngle = isInside ? Math.PI * 0.64 : Math.PI * 0.49;
     const moved = controls.update();
     const busy = moved || !!tween || anims.size > 0;
     if (busy || dirty) {
@@ -1331,36 +1237,45 @@ export function createStudio(host, opt) {
       const to = on ? 1 : 0, from = LIGHT.mood;
       if (to === from) return;
       if (!introDone || reduced) { LIGHT.mood = to; applyLight(); queueEnv(); return; }
-      anim(900, (k) => { LIGHT.mood = from + (to - from) * easeInOut(k); applyLight(); });
+      anim(420, (k) => { LIGHT.mood = from + (to - from) * easeOut(k); applyLight(); });
       envAfter = true;
     },
-    // the room is assembled in front of the visitor: floor, walls, then fittings and light
+    // first showing: photograph the room for its reflections, then frame it
     intro() {
-      const v = views().overview;
       captureEnv();
       introDone = true;
-      const order = { tiles: 0, wall: 1, inlay: 2, fit: 3, light: 4, static: 5 };
-      const list = Array.from(parts.values()).sort((a, b) => order[a.kind] - order[b.kind]);
-      let fitN = 0;
-      list.forEach((p) => {
-        let d = 0;
-        if (p.kind === 'tiles') d = 1;
-        if (p.kind === 'wall') d = 900 + ({ back: 0, left: 150, right: 150, front: 300 }[p.key.slice(5)] || 0);
-        if (p.kind === 'inlay') d = 1700;
-        if (p.kind === 'fit') d = 2100 + (fitN++) * 130;
-        if (p.kind === 'light') d = 2100 + fitN * 130 + 350;
-        if (p.kind === 'static') { p.hidden = false; return; }
-        buildIn(p, d);
-      });
-      if (reduced) { flyTo('overview', 0); return; }
-      camera.position.copy(v.p.clone().applyAxisAngle(UP, -0.35).multiplyScalar(1.15)); controls.target.copy(v.t);
-      camera.fov = v.f; camera.updateProjectionMatrix();
-      flyTo('overview', 4200);
+      flyTo('overview', 0);
+      dirty = true;
     },
     snapshot() { render(); return renderer.domElement; },
     ready() { return ready || Promise.resolve(); }
   };
-  if (opt.debug) window.__studio = { info: () => ({ geo: renderer.info.memory.geometries, tex: renderer.info.memory.textures, prog: renderer.info.programs.length, parts: parts.size, anims: anims.size, glows: glows.size, room: room.children.length, sceneKids: scene.children.length, level, calls: renderer.info.render.calls, dpr: renderer.getPixelRatio(), list: Array.from(parts.values()).map((q) => q.key + ':' + (q.g.visible ? 'v' : 'h') + (q.hidden ? 'H' : '') + ':' + q.g.scale.y.toFixed(2)).join(' ') }) };
+  function shot(name) {
+    const { W, L, xv, sw, sd, xs, fx0, fx1, fz0, fz1, bx, bz } = P, z0 = -L / 2, cx = W / 2 - sw / 2;
+    const sx = (fx0 + fx1) / 2, sz = (fz0 + fz1) / 2;
+    const F = {
+      tap: [[xv + 0.3, 1.16, z0 + 0.62], [xv + 0.02, 1.02, z0 + 0.1], 34],
+      basin: [[xv + 0.12, 1.55, z0 + 1.05], [xv, 0.86, z0 + 0.27], 42],
+      vanity: [[xv + 0.35, 1.25, z0 + 1.75], [xv, 0.7, z0 + 0.25], 40],
+      mirror: [[xv + 0.15, 1.42, z0 + 2.0], [xv, 1.45, z0], 40],
+      screen: [[xs - 1.7, 1.2, z0 + sd / 2 + 0.75], [xs, 1.0, z0 + sd / 2], 50],
+      rain: [[cx - 0.4, 1.5, z0 + 1.05], [cx, 2.05, z0 + 0.36], 44],
+      bench: [[cx - 0.55, 1.15, z0 + 1.7], [cx, 0.38, z0 + 0.2], 44],
+      niche: [[cx - 0.25, 1.32, z0 + 1.35], [cx, 1.25, z0], 38],
+      plinth: [[xv + 0.35, 0.95, z0 + 1.7], [xv, 0.35, z0 + 0.3], 46],
+      cove: [[0.25, 1.35, L / 2 - 0.25], [-0.2, 1.95, z0], 62],
+      star: [[sx + 0.05, 1.75, sz + 1.0], [sx, 0, sz], 42],
+      border: [[sx + 0.1, 2.25, sz + 1.6], [sx, 0, sz], 52],
+      rail: [[-W / 2 + 1.45, 1.35, L / 2 - 0.45], [-W / 2, 1.15, L / 2 - 0.62], 42],
+      floor: [[0.0, 2.2, 0.45], [0.0, 0, 0.1], 58],
+      bath: [[bx - 1.3, 1.5, bz + 1.0], [bx, 0.4, bz], 48],
+      tall: [[-W / 2 + 1.5, 1.5, P.zt + 0.35], [-W / 2, 1.62, P.zt], 40]
+    };
+    if (F[name]) { const f = F[name]; tween = null; isInside = true; controls.maxPolarAngle = Math.PI * 0.64; camera.position.set(...f[0]); controls.target.set(...f[1]); camera.fov = f[2]; camera.updateProjectionMatrix(); controls.update(); }
+    else flyTo(name, 0);
+    dirty = true;
+  }
+  if (opt.debug) window.__studio = { info: () => ({ geo: renderer.info.memory.geometries, tex: renderer.info.memory.textures, prog: renderer.info.programs.length, parts: parts.size, anims: anims.size, glows: glows.size, room: room.children.length, sceneKids: scene.children.length, level, calls: renderer.info.render.calls, dpr: renderer.getPixelRatio(), list: Array.from(parts.values()).map((q) => q.key + ':' + (q.g.visible ? 'v' : 'h')).join(' ') }), shot };
   requestAnimationFrame(loop);
   return api;
 }

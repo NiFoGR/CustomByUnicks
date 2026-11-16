@@ -60,12 +60,13 @@ three.js. What they can set:
 
 How it behaves:
 
-- The room assembles itself on arrival: floor, walls, then fittings and light.
-- Changing something rebuilds only that part. Fittings grow out of a gold
-  outline, new stone pours across the surface behind a lit edge, LED lines
-  draw on, metal shifts colour.
+- Every choice is a picture card showing what it looks like. The pictures
+  are photographs of the 3D room itself (`assets/img/opt/`).
+- Changing something rebuilds only that part, instantly. Stone and metal
+  cross-fade in a quarter of a second; nothing else animates but the camera.
 - Drag to orbit, scroll or pinch to zoom, or jump to the vanity, shower, bath
-  or a plan view. Evening light dims the room so the LEDs show.
+  or a plan view. Inside the room you can look up at the ceiling. Evening
+  light dims the room so the LEDs show.
 - Click anything in the room to open its options. Hovering names it.
 - Copy a link, save a picture, or send the design with the form.
 - On a slow machine it turns off the soft-shadow pass, then lowers the
@@ -90,6 +91,12 @@ For whoever maintains it:
 - **Still images:** `assets/img/studio-poster*.webp` (shown dimmed while the 3D
   loads) and `assets/img/studio-door*` (homepage) are renders of the default
   room. Re-shoot them if the default look changes.
+- **Option pictures:** `assets/img/opt/` holds one 640 x 480 picture per option,
+  used by both the designer and the installations page. Most are renders of
+  the 3D room; the floor layouts and underfloor heating are drawn, and the
+  fluted panel is cropped from one of the project photos. Each package and
+  extra on the installations page names its picture with `img` in
+  `packages-data.js`.
 
 ## Connect the forms
 

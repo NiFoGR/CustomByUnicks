@@ -582,7 +582,7 @@ p:last-child{margin-bottom:0}
 .studio__dim{position:absolute;left:0;top:0;z-index:1;padding:.2rem .55rem;font-size:.68rem;letter-spacing:.14em;color:var(--gold-lt);background:rgba(11,10,9,.72);pointer-events:none;white-space:nowrap}
 .studio__dim[hidden]{display:none}
 
-.studio__panel{position:relative;display:flex;flex-direction:column;min-height:0;overflow-y:auto;overscroll-behavior:contain;background:var(--ink-2);border-left:1px solid var(--line-soft);scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+.studio__panel{position:relative;display:flex;flex-direction:column;min-height:0;overflow-y:auto;background:var(--ink-2);border-left:1px solid var(--line-soft);scrollbar-width:thin;scrollbar-color:var(--line) transparent}
 .studio__head{padding:32px 28px 0}
 .studio__head .eyebrow{margin-bottom:1rem}
 .studio__head h1{font-size:clamp(2rem,2.6vw,2.5rem)}
@@ -591,8 +591,6 @@ p:last-child{margin-bottom:0}
 .studio__label{margin:0 0 .75rem;font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;color:var(--muted-2)}
 .looks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .look{display:grid;align-content:start;gap:.6rem;padding:8px 8px 10px;text-align:left;background:var(--surface);border:1px solid var(--line-soft);transition:border-color .3s,background-color .3s}
-.look__chips{display:grid;grid-template-columns:1fr 1fr 12px;gap:2px;height:32px}
-.look__chips img,.look__chips i{display:block;width:100%;height:100%;object-fit:cover}
 .look__name{font-size:.76rem;line-height:1.3;color:var(--text)}
 .look[aria-pressed="true"]{border-color:var(--gold);background:linear-gradient(180deg,rgba(198,161,91,.08),var(--surface))}
 
@@ -687,3 +685,110 @@ p:last-child{margin-bottom:0}
 /* plain three-column list (no step numbers), used on the shop page */
 .steps3--plain li::after{content:none}
 .steps3--plain h3{padding-right:0}
+
+/* ==========================================================================
+   STUDIO PANEL, picture-card version
+   Every choice shows what it looks like (photographed from the 3D room).
+   Bigger type and targets than the rest of the site: this is a tool.
+   ========================================================================== */
+.studio{grid-template-columns:minmax(0,1fr) clamp(440px,34vw,540px)}
+.studio__head{padding:32px 32px 0}
+.studio__head h1{font-size:clamp(2.1rem,2.6vw,2.7rem)}
+.studio__head .lede{font-size:1rem}
+.studio__looks{padding:26px 32px 0}
+.studio__label{font-size:.72rem}
+.looks{gap:10px}
+.look{padding:0;gap:0;overflow:hidden}
+.look__img{display:block;aspect-ratio:4/3;overflow:hidden;background:var(--ink)}
+.look__img img{width:100%;height:100%;object-fit:cover;transition:transform .5s var(--ease-out)}
+.look__name{display:block;padding:.6rem .7rem .7rem;font-size:.84rem}
+.studio__tabs button{padding:.95rem 0 .85rem;font-size:.66rem;letter-spacing:.12em}
+.studio__tabs b{width:26px;height:26px;font-size:.74rem}
+.studio__body{padding:28px 32px 32px}
+.studio__pane .ogroup + .ogroup{margin-top:2.4rem}
+.ogroup legend{font-size:.78rem;margin-bottom:.35rem}
+.ogroup__help{margin:0 0 1rem;font-size:.88rem;color:var(--muted);line-height:1.5}
+.ogroup legend + .choices,.ogroup legend + .sizer{margin-top:.9rem}
+
+.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.choice{position:relative;display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line-soft);cursor:pointer;transition:border-color .2s var(--ease),background-color .2s var(--ease)}
+.choice input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+.choice__img{position:relative;display:block;aspect-ratio:4/3;overflow:hidden;background:var(--ink)}
+.choice__img img{width:100%;height:100%;object-fit:cover;transition:transform .5s var(--ease-out)}
+.choice__mark{position:absolute;top:10px;right:10px;display:grid;place-items:center;width:28px;height:28px;border:1px solid rgba(239,235,228,.55);background:rgba(11,10,9,.55);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);transition:background-color .2s,border-color .2s}
+.choice__mark.is-round{border-radius:50%}
+.choice__mark svg{width:13px;height:13px;fill:none;stroke:var(--ink);stroke-width:2.4;opacity:0;transform:scale(.6);transition:opacity .2s,transform .25s var(--ease-out)}
+.choice__body{display:grid;gap:.2rem;padding:.8rem .9rem .9rem}
+.choice__name{font-size:1rem;line-height:1.3;color:var(--text)}
+.choice__note{font-size:.84rem;line-height:1.45;color:var(--muted)}
+.choice__price{margin-top:.15rem;font-size:.86rem;color:var(--gold)}
+.choice__price.is-zero{font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted-2)}
+.choice:has(input:checked){border-color:var(--gold);background:linear-gradient(180deg,rgba(198,161,91,.1),var(--surface) 60%)}
+.choice:has(input:checked)::before{content:"";position:absolute;left:0;right:0;top:-1px;z-index:1;height:1px;background:var(--gold-lt);box-shadow:0 0 12px 1px rgba(226,199,146,.6)}
+.choice input:checked ~ .choice__mark{background:var(--gold);border-color:var(--gold)}
+.choice input:checked ~ .choice__mark svg{opacity:1;transform:none}
+.choice:has(input:focus-visible){outline:1px solid var(--gold-lt);outline-offset:3px}
+.choice.is-off{cursor:not-allowed}
+.choice.is-off .choice__img,.choice.is-off .choice__name,.choice.is-off .choice__price{opacity:.4}
+.choice.is-off .choice__note{color:var(--gold-lt)}
+
+.sizer__row{padding:8px 8px 8px 1.2rem}
+.sizer__label{font-size:1rem}
+.sizer__ctl button{width:48px;height:48px;font-size:1.3rem}
+.sizer__ctl output{min-width:6rem;font-size:1.7rem}
+.sizer__area{margin:.4rem 0 0;font-size:.88rem;color:var(--muted)}
+.sizer__area b{font-weight:400;color:var(--text)}
+
+.studio__stepnav{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-top:2.4rem;padding-top:1.6rem;border-top:1px solid var(--line-soft)}
+.studio__prev{min-height:48px;padding:0 .4rem;font-size:.74rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);transition:color .2s}
+.studio__next{min-height:50px}
+.studio__foot{padding:16px 32px 14px}
+.studio__total span{font-size:.68rem}
+.studio__total strong{font-size:2.2rem}
+.studio__acts button{font-size:.72rem;min-height:36px}
+
+.studio__views button,.studio__mood{min-height:46px;font-size:.7rem}
+.studio__views button{padding:0 1.1rem}
+.studio__hint{font-size:.8rem}
+
+@media (hover:hover){
+  .choice:not(.is-off):hover{border-color:var(--line)}
+  .choice:not(.is-off):hover .choice__img img,.look:hover .look__img img{transform:scale(1.04)}
+  .studio__prev:hover{color:var(--text)}
+}
+@media (max-width:1180px){
+  .studio{grid-template-columns:minmax(0,1fr) 420px}
+  .studio__head,.studio__looks,.studio__body{padding-inline:24px}
+  .studio__foot{padding-inline:24px}
+}
+@media (max-width:940px){
+  .studio{display:block}
+  .studio__stage{height:min(46svh,520px)}
+  .studio__tabs{scroll-margin-top:calc(var(--hdr) + min(46svh,520px) + 12px)}
+  .studio__head,.studio__looks,.studio__body{padding-inline:var(--gut)}
+  .studio__foot{padding-inline:var(--gut)}
+  .studio__mood{translate:0 calc(min(46svh,520px) - 100% - 20px)}
+  .studio__views button{padding:0 .75rem;font-size:.64rem}
+}
+@media (max-width:420px){
+  .choices{gap:10px}
+  .choice__body{padding:.65rem .7rem .75rem}
+  .choice__name{font-size:.92rem}
+  .choice__note{font-size:.8rem}
+  .studio__tabs button{font-size:.56rem;letter-spacing:.08em}
+}
+
+/* ---------- installations: package pictures and picture-card extras ---------- */
+.tier{--tp:clamp(26px,3vw,38px);padding:var(--tp)}
+.tier__img{margin:calc(var(--tp) * -1) calc(var(--tp) * -1) 1.6rem;aspect-ratio:4/3;overflow:hidden;background:var(--ink);border-bottom:1px solid var(--line-soft)}
+.tier__img img{width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease-out)}
+.tier__flag{z-index:2}
+.choices--4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.choices--4 .choice__name{font-size:.95rem}
+.choice[hidden]{display:none}
+.choice.is-incl{cursor:default}
+.choice.is-incl .choice__mark{background:var(--gold);border-color:var(--gold)}
+.choice.is-incl .choice__mark svg{opacity:1;transform:none}
+#groups .ogroup + .ogroup{margin-top:3rem}
+@media (hover:hover){ .tier:hover .tier__img img{transform:scale(1.04)} }
+@media (max-width:1280px){ .choices--4{grid-template-columns:repeat(2,minmax(0,1fr))} }

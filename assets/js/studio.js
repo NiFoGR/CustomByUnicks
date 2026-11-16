@@ -69,67 +69,73 @@ function init() {
   const bathOK = () => { const b = byId(D.layouts, 'bath'); return state.w >= (b.minW || 0) && state.l >= (b.minL || 0); };
   const doubleOK = () => state.w >= (byId(D.basins, 'double').minW || 0);
 
-  /* ---------- build the panel ---------- */
+  /* ---------- build the panel: every choice is a picture card ---------- */
+  const OPT = 'assets/img/opt/';
+  // a picture for each option, photographed from the 3D room (stones use the stone itself)
+  const pic = (group, id) => {
+    if (group === 'wall' || group === 'floor' || group === 'feature') return OPT + 'stone-' + id + '.webp';
+    const pre = { layout: 'lay-', pattern: 'pat-', metal: 'metal-', vanity: 'van-', front: 'front-', basin: 'basin-', mirror: 'mir-', screen: 'scr-', led: 'led-', lights: 'li-', extras: 'ex-' }[group];
+    return OPT + pre + id + '.webp';
+  };
   const priceTag = (p) => p ? '+' + money(p) : 'Included';
-  const swatch = (name, o, img, price) =>
-    '<label class="sw' + (img ? '' : ' sw--plain') + '" data-opt="' + o.id + '"><input type="radio" name="' + name + '" value="' + o.id + '">' +
-    (img ? '<span class="sw__img">' + img + '</span>' : '') +
-    '<span class="sw__txt"><span class="sw__name">' + esc(o.name) + '</span><span class="sw__price">' + priceTag(price) + '</span></span></label>';
-  const texImg = (id) => '<img src="assets/tex/' + id + '-sw.webp" alt="" width="56" height="56" loading="lazy">';
-  const check = (o) =>
-    '<label class="opt" data-type="multi" data-opt="' + o.id + '"><input type="checkbox" value="' + o.id + '">' +
-    '<span class="opt__box">' + TICK + '</span>' +
-    '<span><span class="opt__name">' + esc(o.name) + '</span><span class="opt__note">' + esc(o.note) + '</span></span>' +
-    '<span class="opt__price">+' + money(o.price) + '</span></label>';
-  const group = (id, title, body, cls) => '<fieldset class="ogroup" data-group="' + id + '"><legend>' + esc(title) + '</legend><div class="' + (cls || 'opts') + '">' + body + '</div></fieldset>';
-  const plain = (name, list) => list.map((o) => swatch(name, o, null, o.price)).join('');
+  const card = (group, name, type, o, price, note) =>
+    '<label class="choice" data-opt="' + o.id + '" data-group-of="' + group + '">' +
+    '<input type="' + type + '" name="' + name + '" value="' + o.id + '">' +
+    '<span class="choice__img"><img src="' + pic(group, o.id) + '" alt="" width="640" height="480" loading="lazy" decoding="async"' + (group === 'feature' && o.id === 'same' ? ' data-same-stone' : '') + '></span>' +
+    '<span class="choice__mark' + (type === 'radio' ? ' is-round' : '') + '" aria-hidden="true">' + TICK + '</span>' +
+    '<span class="choice__body"><span class="choice__name">' + esc(o.name) + '</span>' +
+    (note !== undefined ? '<span class="choice__note"' + (o.id === 'bath' || o.id === 'double' ? ' data-note-of="' + o.id + '"' : '') + '>' + esc(note || '') + '</span>' : '') +
+    '<span class="choice__price' + (price ? '' : ' is-zero') + '">' + priceTag(price) + '</span></span></label>';
+  const group = (id, title, help, body) =>
+    '<fieldset class="ogroup" data-group="' + id + '"><legend>' + esc(title) + '</legend>' +
+    (help ? '<p class="ogroup__help">' + esc(help) + '</p>' : '') + '<div class="choices">' + body + '</div></fieldset>';
+  const radios = (gid, list, priceOf, notes) => list.map((o) => card(gid, gid, 'radio', o, priceOf(o), notes ? (o.note || '') : undefined)).join('');
+  const checks = (gid, list) => list.map((o) => card(gid, o.id, 'checkbox', o, o.price, o.note)).join('');
 
   $('[data-looks]').innerHTML = D.looks.map((lk) =>
     '<button type="button" class="look" data-look="' + lk.id + '" aria-pressed="false">' +
-    '<span class="look__chips" aria-hidden="true">' + texImg(lk.wall) + texImg(lk.floor) + '<i style="background:' + METAL_CSS[lk.metal] + '"></i></span>' +
+    '<span class="look__img"><img src="' + OPT + 'look-' + lk.id + '.webp" alt="" width="640" height="480" decoding="async"></span>' +
     '<span class="look__name">' + esc(lk.name) + '</span></button>').join('');
 
   const TABS = [['room', 'Room'], ['stone', 'Stone'], ['fit', 'Vanity'], ['shower', 'Shower'], ['light', 'Lighting'], ['extra', 'Extras']];
   const sizer = (k, label, less, more) =>
-    '<div class="sizer__row"><span id="lab-' + k + '">' + label + '</span><div class="sizer__ctl" role="group" aria-labelledby="lab-' + k + '">' +
+    '<div class="sizer__row"><span class="sizer__label" id="lab-' + k + '">' + label + '</span><div class="sizer__ctl" role="group" aria-labelledby="lab-' + k + '">' +
     '<button type="button" data-size="' + k + '" data-d="-1" aria-label="' + less + '">&minus;</button>' +
     '<output data-out="' + k + '" aria-live="polite"></output>' +
     '<button type="button" data-size="' + k + '" data-d="1" aria-label="' + more + '">+</button></div></div>';
   const showerExtras = D.extras.filter((o) => o.tab === 'shower'), otherExtras = D.extras.filter((o) => o.tab !== 'shower');
+  const same = { id: 'same', name: D.feature.same };
   const panels = {
-    room: group('size', 'Room size', sizer('w', 'Width', 'Narrower', 'Wider') + sizer('l', 'Length', 'Shorter', 'Longer'), 'sizer') +
-      '<p class="studio__tip">Roughly is fine. We measure properly at the survey.</p>' +
-      group('layout', 'Layout', D.layouts.map((o) =>
-        '<label class="opt" data-type="single" data-opt="' + o.id + '"><input type="radio" name="layout" value="' + o.id + '">' +
-        '<span class="opt__box">' + TICK + '</span><span><span class="opt__name">' + esc(o.name) + '</span>' +
-        '<span class="opt__note" data-lay-note="' + o.id + '"></span></span>' +
-        '<span class="opt__price' + (o.price ? '' : ' is-zero') + '">' + priceTag(o.price) + '</span></label>').join(''), 'opts opts--1'),
-    stone: group('wall', 'Walls', D.stones.map((o) => swatch('wall', o, texImg(o.id), o.wall)).join(''), 'sws') +
-      group('feature', 'Shower walls', swatch('feature', { id: 'same', name: D.feature.same }, '<img src="" alt="" width="56" height="56" data-same-stone>', 0) +
-        D.stones.map((o) => swatch('feature', o, texImg(o.id), D.feature.price)).join(''), 'sws') +
-      group('floor', 'Floor', D.stones.map((o) => swatch('floor', o, texImg(o.id), o.floor)).join(''), 'sws') +
-      group('pattern', 'Floor layout', plain('pattern', D.floorPatterns), 'sws sws--3'),
-    fit: group('metal', 'Metal finish', D.metals.map((o) => swatch('metal', o, '<i style="background:' + METAL_CSS[o.id] + '"></i>', o.price)).join(''), 'sws') +
-      group('vanity', 'Vanity', D.vanities.map((o) => swatch('vanity', o, o.id === 'stone' ? '<img src="" alt="" width="56" height="56" data-same-stone>' : texImg(o.id), o.price)).join(''), 'sws') +
-      group('front', 'Vanity front', plain('front', D.vanityFronts), 'sws') +
-      group('basin', 'Basin', plain('basin', D.basins), 'sws sws--3') +
-      '<p class="studio__tip" data-basin-note hidden></p>' +
-      group('mirror', 'Mirror', plain('mirror', D.mirrors), 'sws sws--3'),
-    shower: group('screen', 'Glass screen', plain('screen', D.screens), 'sws sws--3') +
-      group('showerx', 'In the shower', showerExtras.map(check).join(''), 'opts opts--1'),
-    light: group('lights', 'Lighting', D.lights.map(check).join(''), 'opts opts--1') +
-      group('led', 'Light colour', plain('led', D.ledTemps), 'sws'),
-    extra: group('extras', 'Extras', otherExtras.map(check).join(''), 'opts opts--1')
+    room: '<fieldset class="ogroup" data-group="size"><legend>Room size</legend><p class="ogroup__help">Roughly is fine. We measure properly at the survey.</p>' +
+        '<div class="sizer">' + sizer('w', 'Width', 'Narrower', 'Wider') + sizer('l', 'Length', 'Shorter', 'Longer') +
+        '<p class="sizer__area">Floor area <b data-area></b></p></div></fieldset>' +
+      group('layout', 'Layout', '', D.layouts.map((o) => card('layout', 'layout', 'radio', o, o.price, '')).join('')),
+    stone: group('wall', 'Walls', 'Real stone, book-matched slab to slab.', radios('wall', D.stones, (o) => o.wall)) +
+      group('feature', 'Inside the shower', 'Use the same stone, or set the shower apart.', card('feature', 'feature', 'radio', same, 0) + D.stones.map((o) => card('feature', 'feature', 'radio', o, D.feature.price)).join('')) +
+      group('floor', 'Floor', '', radios('floor', D.stones, (o) => o.floor)) +
+      group('pattern', 'How the floor is laid', '', radios('pattern', D.floorPatterns, (o) => o.price, true)),
+    fit: group('metal', 'Metal finish', 'Used for every tap, rail and frame.', radios('metal', D.metals, (o) => o.price)) +
+      group('vanity', 'Vanity', '', radios('vanity', D.vanities, (o) => o.price)) +
+      group('front', 'Vanity front', '', radios('front', D.vanityFronts, (o) => o.price)) +
+      group('basin', 'Basin', '', radios('basin', D.basins, (o) => o.price, true)) +
+      group('mirror', 'Mirror', '', radios('mirror', D.mirrors, (o) => o.price)),
+    shower: group('screen', 'Glass screen', '', radios('screen', D.screens, (o) => o.price, true)) +
+      group('showerx', 'In the shower', 'Tick any you want.', checks('extras', showerExtras)),
+    light: group('lights', 'Lighting', 'Tick any you want. Evening light is on so you can see them.', checks('lights', D.lights)) +
+      group('led', 'Light colour', '', radios('led', D.ledTemps, (o) => o.price, true)),
+    extra: group('extras', 'Extras', 'Tick any you want.', checks('extras', otherExtras))
   };
   $('[data-tabs]').innerHTML = TABS.map((t, i) =>
     '<button type="button" role="tab" id="tab-' + t[0] + '" aria-controls="panel-' + t[0] + '" aria-selected="' + !i + '" tabindex="' + (i ? -1 : 0) + '">' +
     '<b>' + (i + 1) + '</b><span>' + t[1] + '</span></button>').join('');
   $('[data-panels]').innerHTML = TABS.map((t, i) =>
     '<div class="studio__pane" role="tabpanel" id="panel-' + t[0] + '" aria-labelledby="tab-' + t[0] + '"' + (i ? ' hidden' : '') + '>' + panels[t[0]] +
+    '<div class="studio__stepnav">' +
+    (i ? '<button type="button" class="studio__prev" data-next="' + TABS[i - 1][0] + '">Back</button>' : '<span></span>') +
     (i < TABS.length - 1
-      ? '<button type="button" class="link studio__next" data-next="' + TABS[i + 1][0] + '">Next: ' + TABS[i + 1][1] + ' ' + ARROW + '</button>'
-      : '<a class="link studio__next" href="#send">Send my design ' + ARROW + '</a>') +
-    '</div>').join('');
+      ? '<button type="button" class="btn studio__next" data-next="' + TABS[i + 1][0] + '">Next: ' + TABS[i + 1][1] + ' ' + ARROW + '</button>'
+      : '<a class="btn btn--solid studio__next" href="#send">Send my design ' + ARROW + '</a>') +
+    '</div></div>').join('');
   $$('[data-note]').forEach((el) => { el.textContent = D.note; });
 
   /* ---------- tabs ---------- */
@@ -156,7 +162,12 @@ function init() {
     const top = $('[data-tabs]').getBoundingClientRect().top;
     if (top < 0 || top > window.innerHeight * 0.6) $('[data-tabs]').scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'start' });
   };
-  $$('[data-next]').forEach((b) => b.addEventListener('click', () => { openTab(b.dataset.next, true); showTabs(); }));
+  $$('[data-next]').forEach((b) => b.addEventListener('click', () => {
+    openTab(b.dataset.next, true);
+    const panel = $('.studio__panel');
+    if (panel.scrollHeight > panel.clientHeight + 4) panel.scrollTo({ top: $('[data-tabs]').offsetTop, behavior: REDUCED ? 'auto' : 'smooth' });
+    else showTabs();
+  }));
 
   /* ---------- the 3D view ---------- */
   const stage = $('[data-stage]');
@@ -255,7 +266,7 @@ function init() {
     touched = true;
     state[k] = Math.round(clamp(state[k] + Number(b.dataset.d) * r.step, r.min, r.max) * 10) / 10;
     render();
-    look('plan');
+    if (studio) { const v = studio.viewName; if (v === 'overview' || v === 'plan') { studio.view(v, 380); markView(v); } }
   });
   $('[data-looks]').addEventListener('click', (e) => {
     const b = e.target.closest('[data-look]');
@@ -299,6 +310,7 @@ function init() {
     ].join('\n');
   }
   window.UNICKS_BUILD = () => ({ text: specText(), link: location.origin + link() });
+  if (/debug/.test(location.hash)) window.__ui = { set(o) { Object.assign(state, o); render(); }, state, mood: setMood };
 
   let shown = 0, tw = 0;
   function showTotal(to) {
@@ -328,16 +340,15 @@ function init() {
     });
     const bathIn = $('input[name="layout"][value="bath"]'), b = byId(D.layouts, 'bath');
     bathIn.disabled = !ok;
-    bathIn.closest('.opt').classList.toggle('is-off', !ok);
-    $('[data-lay-note="bath"]').textContent = ok ? 'Freestanding bath beside the shower' : 'Needs a room at least ' + b.minW.toFixed(1) + ' m wide and ' + b.minL.toFixed(1) + ' m long';
-    $('[data-lay-note="shower"]').textContent = 'A glass screen and a level floor';
+    bathIn.closest('.choice').classList.toggle('is-off', !ok);
+    $('[data-note-of="bath"]').textContent = ok ? 'Freestanding bath beside the shower' : 'Needs a room ' + b.minW.toFixed(1) + ' m wide and ' + b.minL.toFixed(1) + ' m long';
+    $('.choice[data-opt="shower"] .choice__note').textContent = 'Glass screen, level floor';
     const dblIn = $('input[name="basin"][value="double"]'), dbl = byId(D.basins, 'double');
     dblIn.disabled = !dOK;
-    dblIn.closest('.sw').classList.toggle('is-off', !dOK);
-    const bn = $('[data-basin-note]');
-    bn.hidden = dOK;
-    bn.textContent = dOK ? '' : 'A double trough needs a room at least ' + dbl.minW.toFixed(1) + ' m wide.';
-    $$('[data-same-stone]').forEach((img) => { img.src = 'assets/tex/' + state.wall + '-sw.webp'; });
+    dblIn.closest('.choice').classList.toggle('is-off', !dOK);
+    $('[data-note-of="double"]').textContent = dOK ? dbl.note : 'Needs a room ' + dbl.minW.toFixed(1) + ' m wide';
+    $('[data-area]').textContent = (state.w * state.l).toFixed(1) + ' m²';
+    $$('[data-same-stone]').forEach((img) => { img.src = OPT + 'stone-' + state.wall + '.webp'; });
     $$('[data-look]').forEach((btn) => {
       const lk = byId(D.looks, btn.dataset.look);
       const same = SINGLES.every(([k, , list]) => (lk[k] || list[0].id) === state[k]) && (lk.feature || 'same') === state.feature &&
