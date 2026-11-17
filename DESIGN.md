@@ -87,8 +87,10 @@ change the new thing, not the rules.
   flickers.
 - In the 3D designer, every choice is a picture card (4:3) rendered from the
   3D room in the same light, so the options read as one set.
-- Package cards and the extras on the installations page use crops of his
-  own room photos (`assets/img/pick/`), never 3D renders.
+- The installations page uses the same renders: package cards are shot
+  from one fixed camera inside each package's room, so the step up from
+  one package to the next is easy to see. The homepage hero and the
+  gallery use real project photos.
 
 ## 8. Words
 

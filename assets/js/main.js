@@ -113,16 +113,93 @@ var CONTACT_EMAIL = '';
     edges();
   }
 
-  /* ---------- Package cards ---------- */
+  /* ---------- Packages: value, 3D links, cards ---------- */
+  // every paid option counts as an extra (the free 3D design does not)
+  var EXTRAS = [], CROSS = '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 3l6 6M9 3l-6 6"/></svg>';
+  var priceFor = function (o, id) {
+    if (typeof o.price === 'number') return o.price;
+    var v = o.price[id];
+    return v === undefined ? null : v;
+  };
+  var stats = function (p) {
+    var first = DATA.packages[0], n = 0, worth = 0;
+    EXTRAS.forEach(function (o) { if (priceFor(o, p.id) === 0) { n++; worth += priceFor(o, first.id) || 0; } });
+    return { n: n, total: EXTRAS.length, save: first.from + worth - p.from };
+  };
+  // a link that opens the package in the 3D designer; with choices, they are carried over
+  var designURL = function (p, single, multi) {
+    var d = {}, k, li, ex;
+    for (k in p.design) d[k] = p.design[k];
+    li = d.li ? d.li.split(',') : []; ex = d.ex ? d.ex.split(',') : [];
+    if (single) {
+      DATA.groups.forEach(function (g) {
+        g.options.forEach(function (o) {
+          var on = g.type === 'single' ? single[g.id] === o.id : (priceFor(o, p.id) === 0 || !!multi[o.id]), src;
+          if (g.type === 'single') { if (on && o.design) for (k in o.design) d[k] = o.design[k]; return; }
+          src = o.design && on ? o.design : (!on && o.off ? o.off : null);
+          if (src) for (k in src) d[k] = src[k];
+          [['li', li], ['ex', ex]].forEach(function (pair) {
+            var id = o[pair[0]], at;
+            if (!id) return;
+            at = pair[1].indexOf(id);
+            if (on && at < 0) pair[1].push(id);
+            if (!on && at > -1) pair[1].splice(at, 1);
+          });
+        });
+      });
+    }
+    d.li = li.join(','); d.ex = ex.join(',');
+    var q = new URLSearchParams({ pkg: p.id, w: '2.4', l: '2.6', lay: 'shower' });
+    for (k in d) q.set(k, d[k]);
+    return 'design.html?' + q.toString().replace(/%2C/g, ',');
+  };
+  if (DATA) DATA.groups.forEach(function (g) {
+    g.options.forEach(function (o) { if (!o.free && (g.type === 'multi' || typeof o.price === 'object')) EXTRAS.push(o); });
+  });
+
   var tierHTML = function (p, i, action) {
-    return (p.img ? '<div class="tier__img"><img src="' + p.img + '" alt="" width="640" height="480" loading="lazy" decoding="async"></div>' : '') +
+    var st = stats(p);
+    return (p.img ? '<div class="tier__img"><img src="' + p.img + '" alt="" width="800" height="600" loading="lazy" decoding="async"></div>' : '') +
       '<span class="tier__tag">Package ' + String.fromCharCode(65 + i) + '</span>' +
-      (p.featured ? '<span class="tier__flag">Recommended</span>' : '') +
+      (p.flag ? '<span class="tier__flag">' + esc(p.flag) + '</span>' : '') +
       '<h3>' + esc(p.name) + '</h3>' +
       '<p class="tier__sum">' + esc(p.summary) + '</p>' +
       '<div class="tier__price"><small>From</small>' + money(p.from) + '</div>' +
-      '<ul>' + p.includes.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' + action;
+      '<div class="tier__value"><span class="tier__meter" aria-hidden="true"><span style="width:' + Math.round(100 * st.n / st.total) + '%"></span></span>' +
+      '<p>' + (st.n === st.total ? '<b>All ' + st.total + '</b> extras included' : '<b>' + st.n + ' of ' + st.total + '</b> extras included') + '</p>' +
+      '<p class="tier__save">' + (st.save > 0 ? money(st.save) + ' less than adding them one by one' : '&nbsp;') + '</p></div>' +
+      '<ul>' + p.includes.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' + action +
+      '<a class="tier__3d link" href="' + designURL(p) + '">Open in 3D ' + ARROW + '</a>';
   };
+
+  // the same table on every page that has a [data-compare] box
+  var compareHTML = function () {
+    var P = DATA.packages, best = P.filter(function (p) { return p.featured; })[0] || P[P.length - 1];
+    var th = function (p) { return ' class="' + (p === best ? 'is-best' : '') + '"'; };
+    var cell = function (o, p) {
+      var v = priceFor(o, p.id), body;
+      if (v === 0) body = '<span class="cmp__yes">' + TICK + '<span class="sr-only">Included</span></span>';
+      else if (v === null) body = '<span class="cmp__no">' + CROSS + '<span class="sr-only">Not available</span></span>';
+      else body = '<span class="cmp__no">' + CROSS + '<span class="sr-only">Not included,</span></span><small><span class="sr-only">add for </span>+' + money(v) + '</small>';
+      return '<td' + th(p) + '>' + body + '</td>';
+    };
+    var row = function (label, cells) { return '<tr><th scope="row">' + esc(label) + '</th>' + cells + '</tr>'; };
+    var yes = P.map(function (p) { return '<td' + th(p) + '><span class="cmp__yes">' + TICK + '<span class="sr-only">Included</span></span></td>'; }).join('');
+    var body = '<tr class="cmp__group"><th scope="rowgroup" colspan="' + (P.length + 1) + '">In every package</th></tr>' +
+      DATA.base.map(function (b) { return row(b, yes); }).join('');
+    DATA.groups.forEach(function (g) {
+      var opts = g.options.filter(function (o) { return o.free || EXTRAS.indexOf(o) > -1; });
+      if (!opts.length) return;
+      body += '<tr class="cmp__group"><th scope="rowgroup" colspan="' + (P.length + 1) + '">' + esc(g.title) + '</th></tr>' +
+        opts.map(function (o) { return row(o.name, P.map(function (p) { return cell(o, p); }).join('')); }).join('');
+    });
+    return '<table class="cmp"><caption class="sr-only">What each package includes</caption><thead><tr><td></td>' +
+      P.map(function (p) { return '<th scope="col"' + th(p) + '>' + (p === best && p.flag ? '<span class="cmp__flag">' + esc(p.flag) + '</span>' : '') + esc(p.name) + '<small>' + money(p.from) + '</small></th>'; }).join('') +
+      '</tr></thead><tbody>' + body + '</tbody><tfoot><tr><th scope="row">Extras included</th>' +
+      P.map(function (p) { var st = stats(p); return '<td' + th(p) + '><b>' + st.n + '</b> of ' + st.total + '</td>'; }).join('') + '</tr>' +
+      '<tr><th scope="row">You save</th>' + P.map(function (p) { var sv = stats(p).save; return '<td' + th(p) + '>' + (sv > 0 ? money(sv) : '<span class="cmp__dash">&ndash;</span>') + '</td>'; }).join('') + '</tr></tfoot></table>';
+  };
+  $$('[data-compare]').forEach(function (el) { if (DATA) el.innerHTML = compareHTML(); });
 
   var teaser = $('#teaser');
   if (teaser && DATA) {
@@ -262,6 +339,7 @@ var CONTACT_EMAIL = '';
       });
 
       $$('[data-sum-name]').forEach(function (el) { el.textContent = has ? state.pkg.name : 'No package yet'; });
+      $$('[data-sum-3d]').forEach(function (el) { el.hidden = !has; if (has) el.href = designURL(state.pkg, state.single, state.multi); });
       showTotal(total);
       $('[data-sum-lines]').innerHTML = lines.length
         ? lines.map(function (l) { return '<li><span>' + esc(l[0]) + '</span><span>' + esc(l[1]) + '</span></li>'; }).join('')
@@ -280,7 +358,7 @@ var CONTACT_EMAIL = '';
 
     tiersEl.addEventListener('click', function (e) {
       var card = e.target.closest('[data-pkg]');
-      if (!card) return;
+      if (!card || e.target.closest('a')) return;
       var first = !state.pkg;
       state.pkg = pkgById(card.dataset.pkg);
       render();

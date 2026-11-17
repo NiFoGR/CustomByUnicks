@@ -27,7 +27,7 @@ if (D && studioEl) init();
 function init() {
   /* ---------- state: defaults from the first look, then whatever the link says ---------- */
   const state = { w: D.size.w.value, l: D.size.l.value, layout: 'shower', lights: {}, extras: {} };
-  let touched = false;
+  let touched = false, pkg = null;
   // single-choice groups: [state key, link key, options, default]
   const SINGLES = [
     ['wall', 'wall', D.stones], ['floor', 'floor', D.stones], ['pattern', 'pat', D.floorPatterns],
@@ -43,22 +43,33 @@ function init() {
     state.lights = {}; lk.lights.forEach((id) => { state.lights[id] = true; });
     state.extras = {}; lk.extras.forEach((id) => { state.extras[id] = true; });
   }
+  function parse(q, s) {
+    const num = (k, r) => { const v = parseFloat(q.get(k)); return isFinite(v) ? Math.round(clamp(v, r.min, r.max) * 10) / 10 : r.value; };
+    s.w = num('w', D.size.w); s.l = num('l', D.size.l);
+    s.layout = byId(D.layouts, q.get('lay')) ? q.get('lay') : 'shower';
+    // a link made before an option existed gets the plain version of it
+    SINGLES.forEach(([k, qk, list]) => { s[k] = byId(list, q.get(qk)) ? q.get(qk) : list[0].id; });
+    s.feature = byId(D.stones, q.get('feat')) ? q.get('feat') : 'same';
+    const list = (k, src) => { const o = {}; (q.get(k) || '').split(',').forEach((id) => { if (byId(src, id)) o[id] = true; }); return o; };
+    s.lights = list('li', D.lights);
+    s.extras = list('ex', D.extras);
+    return s;
+  }
   function readURL() {
     const q = new URLSearchParams(location.search);
     if (!q.has('wall')) return;
     touched = true;
-    const num = (k, r) => { const v = parseFloat(q.get(k)); return isFinite(v) ? Math.round(clamp(v, r.min, r.max) * 10) / 10 : r.value; };
-    state.w = num('w', D.size.w); state.l = num('l', D.size.l);
-    if (byId(D.layouts, q.get('lay'))) state.layout = q.get('lay');
-    // a link made before an option existed gets the plain version of it
-    SINGLES.forEach(([k, qk, list]) => { state[k] = byId(list, q.get(qk)) ? q.get(qk) : list[0].id; });
-    state.feature = byId(D.stones, q.get('feat')) ? q.get('feat') : 'same';
-    const list = (k, src) => { const o = {}; (q.get(k) || '').split(',').forEach((id) => { if (byId(src, id)) o[id] = true; }); return o; };
-    state.lights = list('li', D.lights);
-    state.extras = list('ex', D.extras);
+    parse(q, state);
+    // opened from an installation package: its price is the starting point
+    const P = window.UNICKS_DATA && window.UNICKS_DATA.packages.filter((x) => x.id === q.get('pkg'))[0];
+    if (P) {
+      const ps = parse(new URLSearchParams(Object.assign({ w: '2.4', l: '2.6', lay: 'shower' }, P.design)), {});
+      pkg = { id: P.id, name: P.name, from: P.from, raw: raw(ps) };
+    }
   }
   function link() {
     const p = new URLSearchParams();
+    if (pkg) p.set('pkg', pkg.id);
     p.set('w', state.w.toFixed(1)); p.set('l', state.l.toFixed(1)); p.set('lay', state.layout);
     SINGLES.forEach(([k, qk]) => p.set(qk, state[k]));
     p.set('feat', state.feature);
@@ -137,6 +148,7 @@ function init() {
       : '<a class="btn btn--solid studio__next" href="#send">Send my design ' + ARROW + '</a>') +
     '</div></div>').join('');
   $$('[data-note]').forEach((el) => { el.textContent = D.note; });
+  if (pkg) $$('.studio__total > span, .pbar--studio small').forEach((el) => { el.textContent = pkg.name + ' guide price'; });
 
   /* ---------- tabs ---------- */
   const tabs = $$('[role="tab"]');
@@ -279,23 +291,25 @@ function init() {
 
   /* ---------- price and summary ---------- */
   const featOn = () => state.feature !== 'same' && state.feature !== state.wall;
-  function total() {
-    let t = D.base + (state.w * state.l - D.baseArea) * D.perM2;
-    t += byId(D.layouts, state.layout).price;
-    t += byId(D.stones, state.wall).wall + byId(D.stones, state.floor).floor;
-    if (featOn()) t += D.feature.price;
-    const ped = state.basin === 'pedestal';
-    SINGLES.forEach(([k, , list]) => { if (k !== 'wall' && k !== 'floor' && !(ped && (k === 'vanity' || k === 'front'))) t += byId(list, state[k]).price || 0; });
-    D.lights.forEach((o) => { if (state.lights[o.id]) t += o.price; });
-    D.extras.forEach((o) => { if (state.extras[o.id]) t += o.price; });
-    return Math.round(t / 50) * 50;
+  function raw(s) {
+    let t = D.base + (s.w * s.l - D.baseArea) * D.perM2;
+    t += byId(D.layouts, s.layout).price;
+    t += byId(D.stones, s.wall).wall + byId(D.stones, s.floor).floor;
+    if (s.feature !== 'same' && s.feature !== s.wall) t += D.feature.price;
+    const ped = s.basin === 'pedestal';
+    SINGLES.forEach(([k, , list]) => { if (k !== 'wall' && k !== 'floor' && !(ped && (k === 'vanity' || k === 'front'))) t += byId(list, s[k]).price || 0; });
+    D.lights.forEach((o) => { if (s.lights[o.id]) t += o.price; });
+    D.extras.forEach((o) => { if (s.extras[o.id]) t += o.price; });
+    return t;
   }
+  // from a package: its price, plus or minus whatever has been changed since
+  const total = () => Math.round((pkg ? pkg.from + raw(state) - pkg.raw : raw(state)) / 50) * 50;
   function specText() {
     const names = (src, on) => src.filter((o) => on[o.id]).map((o) => o.name).join(', ') || 'None';
     const n = (list, id) => byId(list, id).name;
     const area = state.w * state.l;
     return [
-      'Custom design',
+      pkg ? 'Based on the ' + pkg.name + ' package' : 'Custom design',
       'Room: ' + state.w.toFixed(1) + ' m x ' + state.l.toFixed(1) + ' m (' + area.toFixed(1) + ' m²), ' + n(D.layouts, state.layout).toLowerCase(),
       'Walls: ' + n(D.stones, state.wall),
       'Shower walls: ' + (featOn() ? n(D.stones, state.feature) : 'Same as the walls'),

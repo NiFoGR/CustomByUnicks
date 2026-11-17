@@ -92,10 +92,15 @@ For whoever maintains it:
   loads) and `assets/img/studio-door*` (homepage) are renders of the default
   room. Re-shoot them if the default look changes.
 - **Option pictures:** `assets/img/opt/` holds one 640 x 480 render per
-  designer option, taken from the 3D room. The packages and extras on the
-  installations page use crops of the project photos instead
-  (`assets/img/pick/`, 800 x 600 for packages and 640 x 480 for extras). Each
-  names its picture with `img` in `packages-data.js`.
+  option, taken from the 3D room. The installations page uses the same
+  pictures for its extras. The package cards (`opt/pkg-a.webp` to
+  `pkg-c.webp`, 800 x 600) are rendered from the `wide` camera in
+  `studio-scene.js` with each package's `design` from `packages-data.js`.
+  Re-render them if a package changes.
+- **Packages and the designer:** each package has a `design` entry, the same
+  settings as a designer link. "Open in 3D" on a card and "See it in 3D" in
+  the price box use it, with the customer's finish and extras on top. The
+  designer links back to the comparison table.
 
 ## The shop (shop.html): plan for going live
 

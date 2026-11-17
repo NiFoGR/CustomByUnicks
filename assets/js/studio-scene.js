@@ -1297,7 +1297,8 @@ export function createStudio(host, opt) {
       rail: [[-W / 2 + 1.45, 1.35, L / 2 - 0.45], [-W / 2, 1.15, L / 2 - 0.62], 42],
       floor: [[0.0, 2.2, 0.45], [0.0, 0, 0.1], 58],
       bath: [[bx - 1.3, 1.5, bz + 1.0], [bx, 0.4, bz], 48],
-      tall: [[-W / 2 + 1.5, 1.5, P.zt + 0.35], [-W / 2, 1.62, P.zt], 40]
+      tall: [[-W / 2 + 1.5, 1.5, P.zt + 0.35], [-W / 2, 1.62, P.zt], 40],
+      wide: [[-W / 2 + 0.3, 1.75, L / 2 - 0.15], [W * 0.12, 0.8, z0 + 0.45], 66]
     };
     if (F[name]) { const f = F[name]; tween = null; isInside = true; controls.maxPolarAngle = Math.PI * 0.64; camera.position.set(...f[0]); controls.target.set(...f[1]); camera.fov = f[2]; camera.updateProjectionMatrix(); controls.update(); }
     else flyTo(name, 0);
