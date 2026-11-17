@@ -64,6 +64,15 @@ How it behaves:
   are photographs of the 3D room itself (`assets/img/opt/`).
 - Changing something rebuilds only that part, instantly. Stone and metal
   cross-fade in a quarter of a second; nothing else animates but the camera.
+  A part fixed to a wall also rebuilds when that wall moves, so nothing is
+  left floating when the room is resized.
+- The layout follows the room size. The shower sits in the back right and
+  the vanity on the back wall. The toilet goes on the left wall, clear of
+  the space in front of the basin. The door is on the front wall, beside the
+  shower, or by the left wall when a bath takes the right side. The towel
+  rail goes on the right wall beside the shower, or by the door with a bath.
+  A bath or double basin that stops fitting comes back when the room is made
+  big enough again.
 - Drag to orbit, scroll or pinch to zoom, or jump to the vanity, shower, bath
   or a plan view. Inside the room you can look up at the ceiling. Evening
   light dims the room so the LEDs show.

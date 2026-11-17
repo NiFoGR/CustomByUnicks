@@ -328,6 +328,7 @@ export function createStudio(host, opt) {
   const pedestal = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), M.pedestal);
   pedestal.rotation.x = -Math.PI / 2; pedestal.position.y = -0.121;
   scene.add(pedestal);
+  let bloomBase = 0.4;
   const LIGHT = { mood: 0, cool: 0 };       // 0..1, animated between day/evening and warm/neutral
   const ledColor = new THREE.Color();
   function paintGlow(m) { m.color.copy(ledColor).multiplyScalar(m.userData.k * (1 + 0.25 * LIGHT.mood) * m.userData.fade); }
@@ -340,7 +341,7 @@ export function createStudio(host, opt) {
     M.strip.color.copy(ledColor).multiplyScalar(6 + 2 * e);
     M.sconce.emissive.copy(ledColor); M.sconce.emissiveIntensity = 2 + 1.4 * e;
     M.downlight.color.setRGB(1, 0.86, 0.66).lerp(new THREE.Color(1, 0.96, 0.9), LIGHT.cool).multiplyScalar(3 - 1.6 * e);
-    bloom.strength = 0.4 + 0.15 * e;
+    bloomBase = 0.4 + 0.15 * e;
     renderer.toneMappingExposure = 1 + 0.15 * e;
     dirty = true;
   }
@@ -378,12 +379,17 @@ export function createStudio(host, opt) {
     const bath = s.layout === 'bath' && L >= 2.9 && W >= 2.0;
     const vx0 = -W / 2 + 0.12, vx1 = xs - 0.12;
     const vw = clamp(vx1 - vx0 - 0.1, 0.6, 1.5), xv = (vx0 + vx1) / 2;
-    const zt = -L / 2 + clamp(L * 0.38, 0.75, 1.3);
     const ba = 0.375, bb = 0.85, bx = W / 2 - 0.08 - ba, bz = (zf + 0.08 + L / 2 - 0.08) / 2;
+    // toilet on the left wall: clear of the space in front of the basin, and of the door (and the rail, with a bath)
+    // (without a bath the door is on the right of the front wall, so the toilet can go further forward)
+    const dtMax = Math.max(0.75, bath ? L - 1.25 : L - 0.4);
+    const zt = -L / 2 + clamp(Math.max(1.22, L * 0.45), 0.75, dtMax);
+    // towel rail: beside the shower on the right wall, or by the door when the bath takes that wall
+    const railWall = bath ? 'left' : 'right', railS = bath ? 0.62 : clamp(sd + (L - sd) / 2, sd + 0.4, L - 0.4);
     const fx0 = -W / 2 + 0.66, fx1 = bath ? bx - ba - 0.3 : W / 2 - 0.12;
     const fz0 = zf + 0.12, fz1 = L / 2 - 0.12;
     const basin = s.basin === 'double' && vw < 1.1 ? 'trough' : (s.basin || 'trough');
-    return { W, L, sw, sd, xs, zf, bath, vw, xv, zt, ba, bb, bx, bz, fx0, fx1, fz0, fz1, basin,
+    return { W, L, sw, sd, xs, zf, bath, vw, xv, zt, ba, bb, bx, bz, fx0, fx1, fz0, fz1, basin, railWall, railS,
       lit: s.lights || {}, ex: s.extras || {} };
   }
   function wallsDef(W, L) {
@@ -435,7 +441,8 @@ export function createStudio(host, opt) {
   /* ---------- parts: rebuilt only when what they depend on changes ---------- */
   function part(key, sig, o, make) {
     seen.add(key);
-    const s = JSON.stringify(sig), old = parts.get(key);
+    // a part on a wall also depends on where that wall is, or it is left floating when the room is resized
+    const s = JSON.stringify(o.wall && WD[o.wall] ? [sig, WD[o.wall].o.toArray()] : sig), old = parts.get(key);
     if (old && old.sig === s) return old;
     const g = new THREE.Group();
     g.userData.part = key;
@@ -703,7 +710,7 @@ export function createStudio(host, opt) {
     if (ped) {
       if (P.lit.plinth) part('plinthGlow', [xv, L, 'pedestal'], { kind: 'light' }, (g) => {
         const ring = mesh(new THREE.TorusGeometry(0.205, 0.004, 8, 96), M.strip, g, xv, 0.008, z0 + 0.3, false); ring.rotation.x = Math.PI / 2; ring.userData.noPick = true;
-        plane(1.1, 1.1, glowMat(S.round, 1.0), g, xv, DECAL, z0 + 0.3, -Math.PI / 2);
+        plane(1.0, 0.86, glowMat(S.round, 1.0), g, xv, DECAL, z0 + 0.44, -Math.PI / 2);
       });
       else part('vanityShade', [xv, L, 'pedestal'], { kind: 'static' }, (g) => { plane(0.75, 0.75, AO.round, g, xv, DECAL, z0 + 0.3, -Math.PI / 2); });
     } else if (P.lit.plinth) {
@@ -845,8 +852,9 @@ export function createStudio(host, opt) {
 
   function railPart() {
     if (!P.ex.rail) return;
-    part('rail', [P.L], { kind: 'fit', wall: 'left', pick: 'rail' }, (g) => {
-      const r = onWall(WD.left, 0.62, 0, g), y0 = 0.7, y1 = 1.7, hw = 0.25;
+    const { railWall, railS } = P;
+    part('rail', [railWall, railS], { kind: 'fit', wall: railWall, pick: 'rail' }, (g) => {
+      const r = onWall(WD[railWall], railS, 0, g), y0 = 0.7, y1 = 1.7, hw = 0.25;
       [-1, 1].forEach((sgn) => {
         cyl(0.013, y1 - y0, M.metal, r, 'y', sgn * hw, (y0 + y1) / 2, 0.065);
         [y0 + 0.08, y1 - 0.08].forEach((yy) => cyl(0.009, 0.06, M.metal, r, 'z', sgn * hw, yy, 0.03));
@@ -976,7 +984,8 @@ export function createStudio(host, opt) {
       const s = L / 2 - zt;
       holes.left = { s0: s - 0.15, s1: s + 0.15, y0: 1.22, y1: 2.04, depth: 0.1 };
     }
-    const door = { s0: W - 0.95, s1: W - 0.15, y0: 0, y1: 2.05, through: true };
+    // the door keeps clear of the bath; without one it opens beside the shower, away from the toilet
+    const door = P.bath ? { s0: W - 0.95, s1: W - 0.15, y0: 0, y1: 2.05, through: true } : { s0: 0.15, s1: 0.95, y0: 0, y1: 2.05, through: true };
     wallPart('back', holes.back ? [holes.back] : [], [W - sw, W]);
     wallPart('right', [], [0, sd]);
     wallPart('front', [door], null);
@@ -1228,6 +1237,9 @@ export function createStudio(host, opt) {
     const busy = moved || !!tween || anims.size > 0;
     if (busy || dirty) {
       dirty = false;
+      // looking straight down on the lit floor, glow spreads over the whole picture: ease it off
+      const dy = (camera.position.y - controls.target.y) / Math.max(0.01, camera.position.distanceTo(controls.target));
+      bloom.strength = bloomBase * (1 - 0.65 * (isInside ? 0 : clamp((dy - 0.8) / 0.15, 0, 1)));
       render();
       pace(now, busy);
       if (first) { first = false; if (opt.onFirstFrame) opt.onFirstFrame(); }
@@ -1278,6 +1290,10 @@ export function createStudio(host, opt) {
     snapshot() { render(); return renderer.domElement; },
     ready() { return ready || Promise.resolve(); }
   };
+  function railShot() {
+    const r = WD[P.railWall], at0 = at(r, P.railS, 1.15, 0), eye = at(r, P.railS - 0.17, 1.35, 1.45);
+    return [eye.toArray(), at0.toArray(), 42];
+  }
   function shot(name) {
     const { W, L, xv, sw, sd, xs, fx0, fx1, fz0, fz1, bx, bz } = P, z0 = -L / 2, cx = W / 2 - sw / 2;
     const sx = (fx0 + fx1) / 2, sz = (fz0 + fz1) / 2;
@@ -1294,7 +1310,7 @@ export function createStudio(host, opt) {
       cove: [[0.25, 1.35, L / 2 - 0.25], [-0.2, 1.95, z0], 62],
       star: [[sx + 0.05, 1.75, sz + 1.0], [sx, 0, sz], 42],
       border: [[sx + 0.1, 2.25, sz + 1.6], [sx, 0, sz], 52],
-      rail: [[-W / 2 + 1.45, 1.35, L / 2 - 0.45], [-W / 2, 1.15, L / 2 - 0.62], 42],
+      rail: railShot(),
       floor: [[0.0, 2.2, 0.45], [0.0, 0, 0.1], 58],
       bath: [[bx - 1.3, 1.5, bz + 1.0], [bx, 0.4, bz], 48],
       tall: [[-W / 2 + 1.5, 1.5, P.zt + 0.35], [-W / 2, 1.62, P.zt], 40],
@@ -1304,7 +1320,9 @@ export function createStudio(host, opt) {
     else flyTo(name, 0);
     dirty = true;
   }
-  if (opt.debug) window.__studio = { info: () => ({ geo: renderer.info.memory.geometries, tex: renderer.info.memory.textures, prog: renderer.info.programs.length, parts: parts.size, anims: anims.size, glows: glows.size, room: room.children.length, sceneKids: scene.children.length, level, calls: renderer.info.render.calls, dpr: renderer.getPixelRatio(), list: Array.from(parts.values()).map((q) => q.key + ':' + (q.g.visible ? 'v' : 'h')).join(' ') }), shot };
+  if (opt.debug) window.__studio = { info: () => ({ geo: renderer.info.memory.geometries, tex: renderer.info.memory.textures, prog: renderer.info.programs.length, parts: parts.size, anims: anims.size, glows: glows.size, room: room.children.length, sceneKids: scene.children.length, level, calls: renderer.info.render.calls, dpr: renderer.getPixelRatio(), list: Array.from(parts.values()).map((q) => q.key + ':' + (q.g.visible ? 'v' : 'h')).join(' ') }), shot,
+    layout: () => P,
+    boxes: () => { const o = {}; room.updateMatrixWorld(true); parts.forEach((q, k) => { const b = new THREE.Box3(); q.g.traverse((m) => { if (m.isMesh && !m.userData.noPick) b.expandByObject(m); }); if (b.isEmpty()) return; o[k] = { min: b.min.toArray().map((v) => +v.toFixed(3)), max: b.max.toArray().map((v) => +v.toFixed(3)), wall: q.wall }; }); return o; } };
   requestAnimationFrame(loop);
   return api;
 }

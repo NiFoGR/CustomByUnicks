@@ -36,6 +36,7 @@ function init() {
   ];
   applyLook(D.looks[0]);
   readURL();
+  const want = { layout: state.layout, basin: state.basin };
 
   function applyLook(lk) {
     SINGLES.forEach(([k, , list]) => { state[k] = lk[k] || list[0].id; });
@@ -263,6 +264,7 @@ function init() {
     touched = true;
     if (i.type === 'radio') {
       state[i.name] = i.value;
+      if (i.name in want) want[i.name] = i.value;
       look(i.name === 'layout' ? (i.value === 'bath' ? 'bath' : 'overview') : where[i.name]);
     } else {
       const bucket = byId(D.lights, i.value) ? state.lights : state.extras;
@@ -284,6 +286,7 @@ function init() {
     const b = e.target.closest('[data-look]');
     if (!b) return;
     applyLook(byId(D.looks, b.dataset.look));
+    want.basin = state.basin;
     touched = true;
     render();
     look('overview');
@@ -343,6 +346,9 @@ function init() {
 
   function render() {
     const ok = bathOK(), dOK = doubleOK();
+    // a bath or double basin that no longer fits comes back when the room is made big enough again
+    if (want.layout === 'bath' && ok) state.layout = 'bath';
+    if (want.basin === 'double' && dOK) state.basin = 'double';
     if (state.layout === 'bath' && !ok) state.layout = 'shower';
     if (state.basin === 'double' && !dOK) state.basin = 'trough';
     ['w', 'l'].forEach((k) => {
