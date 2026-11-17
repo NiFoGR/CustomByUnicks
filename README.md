@@ -91,12 +91,11 @@ For whoever maintains it:
 - **Still images:** `assets/img/studio-poster*.webp` (shown dimmed while the 3D
   loads) and `assets/img/studio-door*` (homepage) are renders of the default
   room. Re-shoot them if the default look changes.
-- **Option pictures:** `assets/img/opt/` holds one 640 x 480 picture per option,
-  used by both the designer and the installations page. Most are renders of
-  the 3D room; the floor layouts and underfloor heating are drawn, and the
-  fluted panel is cropped from one of the project photos. Each package and
-  extra on the installations page names its picture with `img` in
-  `packages-data.js`.
+- **Option pictures:** `assets/img/opt/` holds one 640 x 480 render per
+  designer option, taken from the 3D room. The packages and extras on the
+  installations page use crops of the project photos instead
+  (`assets/img/pick/`, 800 x 600 for packages and 640 x 480 for extras). Each
+  names its picture with `img` in `packages-data.js`.
 
 ## The shop (shop.html): plan for going live
 

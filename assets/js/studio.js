@@ -110,7 +110,7 @@ function init() {
         '<div class="sizer">' + sizer('w', 'Width', 'Narrower', 'Wider') + sizer('l', 'Length', 'Shorter', 'Longer') +
         '<p class="sizer__area">Floor area <b data-area></b></p></div></fieldset>' +
       group('layout', 'Layout', '', D.layouts.map((o) => card('layout', 'layout', 'radio', o, o.price, '')).join('')),
-    stone: group('wall', 'Walls', 'Real stone, book-matched slab to slab.', radios('wall', D.stones, (o) => o.wall)) +
+    stone: group('wall', 'Walls', 'Real stone, matched slab to slab.', radios('wall', D.stones, (o) => o.wall)) +
       group('feature', 'Inside the shower', 'Use the same stone, or set the shower apart.', card('feature', 'feature', 'radio', same, 0) + D.stones.map((o) => card('feature', 'feature', 'radio', o, D.feature.price)).join('')) +
       group('floor', 'Floor', '', radios('floor', D.stones, (o) => o.floor)) +
       group('pattern', 'How the floor is laid', '', radios('pattern', D.floorPatterns, (o) => o.price, true)),
@@ -121,7 +121,7 @@ function init() {
       group('mirror', 'Mirror', '', radios('mirror', D.mirrors, (o) => o.price)),
     shower: group('screen', 'Glass screen', '', radios('screen', D.screens, (o) => o.price, true)) +
       group('showerx', 'In the shower', 'Tick any you want.', checks('extras', showerExtras)),
-    light: group('lights', 'Lighting', 'Tick any you want. Evening light is on so you can see them.', checks('lights', D.lights)) +
+    light: group('lights', 'Lighting', 'Evening light is on so you can see them.', checks('lights', D.lights)) +
       group('led', 'Light colour', '', radios('led', D.ledTemps, (o) => o.price, true)),
     extra: group('extras', 'Extras', 'Tick any you want.', checks('extras', otherExtras))
   };

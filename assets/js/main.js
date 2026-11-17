@@ -167,7 +167,7 @@ var CONTACT_EMAIL = '';
 
     $('#groups').innerHTML = DATA.groups.map(function (g) {
       return '<fieldset class="ogroup"><legend>' + esc(g.title) + '</legend>' +
-        '<p class="ogroup__help">' + (g.type === 'single' ? 'Pick one.' : 'Tick any you want. Anything your package already has is ticked for you.') + '</p>' +
+        '<p class="ogroup__help">' + (g.type === 'single' ? 'Pick one.' : 'Tick any you want.') + '</p>' +
         '<div class="choices choices--4">' +
         g.options.map(function (o) {
           var type = g.type === 'single' ? 'radio' : 'checkbox';
@@ -218,8 +218,8 @@ var CONTACT_EMAIL = '';
       var has = !!state.pkg;
       $('#cfg').classList.toggle('is-locked', !has);
       $('#cfg-hint').textContent = has
-        ? 'Anything already in your package is ticked. Add whatever else you want.'
-        : 'Choose a package above to see the extras.';
+        ? 'Your package items are ticked. Add anything else.'
+        : 'Choose a package to see the extras.';
       $$('[data-pkg]').forEach(function (card) {
         var on = has && card.dataset.pkg === state.pkg.id;
         card.classList.toggle('is-picked', on);
@@ -238,13 +238,13 @@ var CONTACT_EMAIL = '';
           el.hidden = p === null;
           if (p === null) { input.checked = false; return; }
           var incl = p === 0, on, price = $('.choice__price', el);
-          price.textContent = incl ? 'Included' : '+' + money(p);
+          price.textContent = incl ? (o.free ? 'Free' : 'Included') : '+' + money(p);
           price.classList.toggle('is-zero', incl);
           if (g.type === 'single') {
             on = state.single[g.id] === o.id;
             input.checked = on;
             if (on) {
-              lines.push([g.title + ': ' + o.name, incl ? 'Included' : '+' + money(p)]);
+              lines.push([o.name + ' ' + g.title.toLowerCase(), incl ? 'Included' : '+' + money(p)]);
               text.push(g.title + ': ' + o.name + (incl ? '' : ' (+' + money(p) + ')'));
             }
           } else {

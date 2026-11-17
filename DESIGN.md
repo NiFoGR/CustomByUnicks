@@ -85,13 +85,16 @@ change the new thing, not the rules.
   camera moves smoothly. Surfaces that touch are always set a few millimetres
   apart, and the wall core stands back from niche openings, so nothing
   flickers.
-- Every choice is shown as a picture card (4:3), photographed from the 3D
-  room in the same light, so the options read as one set.
+- In the 3D designer, every choice is a picture card (4:3) rendered from the
+  3D room in the same light, so the options read as one set.
+- Package cards and the extras on the installations page use crops of his
+  own room photos (`assets/img/pick/`), never 3D renders.
 
 ## 8. Words
 
 - Plain British English, written to the customer ("you"), short sentences.
+  Say it in as few words as possible.
 - One thing to do per section. Prices shown early. No jargon.
-- No em dashes, no middle dots between words, no slogans, no lists of three
+- No em dashes, no colons in sentences, no middle dots between words, no slogans, no lists of three
   used for rhythm, no "elevate", "seamless", "unparalleled" and the like.
 - Unknown facts stay as visible placeholders (`class="ph"`) until confirmed.

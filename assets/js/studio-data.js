@@ -15,7 +15,7 @@ window.UNICKS_STUDIO = {
   base: 13950,          // design and full fit of a walk-in shower room of baseArea m²
   baseArea: 5,
   perM2: 950,
-  note: 'Guide price. You get a fixed quote in writing after the free survey.',
+  note: 'Guide price. You get a fixed quote after the free survey.',
 
   // room size in metres; customers set it roughly, it gets measured at the survey
   size: {
@@ -88,11 +88,11 @@ window.UNICKS_STUDIO = {
   ],
 
   lights: [
-    { id: 'plinth', name: 'Under-glow', note: 'LED strip under the vanity and the shower bench', price: 380 },
+    { id: 'plinth', name: 'Under-glow', note: 'Under the vanity and the bench', price: 380 },
     { id: 'mirror', name: 'Backlit mirror', note: 'Soft light around the mirror', price: 420 },
-    { id: 'niche', name: 'Lit niches', note: 'One in the shower and a tall one above the toilet', price: 950 },
-    { id: 'cove', name: 'Ceiling cove', note: 'A hidden LED line around the ceiling', price: 1100 },
-    { id: 'sconce', name: 'Wall lights', note: 'A pair either side of the mirror', price: 480 }
+    { id: 'niche', name: 'Lit niches', note: 'In the shower and above the toilet', price: 950 },
+    { id: 'cove', name: 'Ceiling cove', note: 'Hidden LED line round the ceiling', price: 1100 },
+    { id: 'sconce', name: 'Wall lights', note: 'Either side of the mirror', price: 480 }
   ],
 
   extras: [
